@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unravel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+</head>
+<style>
+    body {
+        padding: 0%;
+        margin: 0%;
+        background-color: black;
+    }
+
+
+    video {
+        position: fixed;
+        opacity: 30%;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+    }
+
+    .content {
+        color: rgb(255, 255, 255);
+    }
+
+    .header {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .header nav {
+        padding: 5px;
+        position: fixed;
+        border-radius: 25px;
+        top: 20px;
+        padding-left: 30px;
+        padding-right: 30px;
+        display: flex;
+        gap: 100px;
+    }
+
+    a {
+        color: white;
+        text-shadow: 0 0 10px rgb(0, 0, 0);
+        text-decoration: none;
+        font-size: 18px;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s ease;
+    }
+
+    a:hover {
+        transform: scale(1.05);
+        color: gray;
+    }
+
+    .main {
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        top: 100px;
+        text-align: center;
+    }
+
+    .main p {
+        font-size: 25px;
+        font-weight: 520;
+        font-family: "Poppins", sans-serif;
+        text-shadow: 0 0 90px rgb(255, 255, 255);
+
+    }
+
+    .main h1 {
+        transition: text-shadow 0.5s ease;
+        font-size: 200px;
+        text-shadow: 0 0 100px black;
+        line-height: 0%;
+        font-family: "Poppins", sans-serif;
+    }
+
+    .btn {
+        text-shadow: rgb(255, 255, 255);
+        font-size: 30px;
+        font-weight: bold;
+        color: black;
+        text-shadow: 0 0 10px white;
+        padding-left: 15px;
+        padding-right: 15px;
+        border-radius: 25px;
+        transition: transform 0.2s ease;
+    }
+
+    .btn img{
+        width: 100px;
+    }
+
+    .btn:hover {
+        transform: scale(1.1);
+        color: black;
+        text-shadow: 0 0 4px white;
+    }
+</style>
+
+<body>
+    <video src="../images/background.mp4" autoplay muted loop></video>
+    <div class="content">
+        <div class="header">
+            <nav>
+                <a href="about.html">About</a>
+                <a href="">Grind</a>
+                <a href="">Know your &lt;/&gt;</a>
+                <a href="">Sign-in</a>
+            </nav>
+        </div>
+
+        <div class="main">
+            <h1>Unravel</h1>
+            <p>“Master DSA patterns, write smarter code, and <br> instantly analyze its time and space complexity — all
+                in one place.”</p>
+                <a href="" class="btn"><img src="./images/computer.png" alt=""></a>
+        </div>
+        <div class="footer">
+
+        </div>
+    </div>
+</body>
+
+</html>

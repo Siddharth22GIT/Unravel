@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <!-- Google Sign In Script -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .login-container {
+            background: transparent;
+            border: 2px solid white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.774);
+            width: 100%;
+            max-width: 400px;
+        }
+
+
+        #email {
+            opacity: 70%;
+            color: rgb(0, 0, 0);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        #password {
+            opacity: 70%;
+            color: rgb(0, 0, 0);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .google-btn {
+            width: 100%;
+            padding: 0.8rem;
+            opacity: 70%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            gap: 10px;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #2980b9;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <video src="../images/aboutBackground.mp4" autoplay muted loop></video>
+    <div class="login-container">
+        <h1>Welcome Back</h1>
+
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+            <img src="../images/images-removebg-preview.png" alt="Google Logo">
+            <span>Continue with Google</span>
+        </button>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+        <form id="loginForm" onsubmit="handleEmailLogin(event)">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <button type="submit" class="login-btn">Log In</button>
+        </form>
+    </div>
+
+    <script>
+        // Initialize Google client
+        let googleClient;
+
+        window.onload = function () {
+            // Initialize the client
+            googleClient = google.accounts.oauth2.initTokenClient({
+                client_id: '577870694438-4dqu366240hkidg5bhcbcgedc5h3hr2k.apps.googleusercontent.com',
+                scope: 'email profile',
+                callback: handleGoogleCredentialResponse
+            });
+        };
+
+        // Handle Google Sign-In button click
+        function handleGoogleSignIn() {
+            googleClient.requestAccessToken();
+        }
+
+        // Handle Google Sign-In response
+        function handleGoogleCredentialResponse(response) {
+            if (response.access_token) {
+                // Fetch user details using the access token
+                fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: {
+                        'Authorization': `Bearer ${response.access_token}`
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Logged in as:', data.name);
+                        // Here you would typically send the token to your backend
+                        // handleServerAuth(response.access_token);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user info:', error);
+                    });
+            }
+        }
+
+        // Handle Email Login
+        function handleEmailLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Reset error messages
+            document.getElementById('emailError').style.display = 'none';
+            document.getElementById('passwordError').style.display = 'none';
+
+            // Basic validation
+            let hasError = false;
+
+            if (!isValidEmail(email)) {
+                showError('emailError', 'Please enter a valid email address');
+                hasError = true;
+            }
+
+            if (password.length < 6) {
+                showError('passwordError', 'Password must be at least 6 characters');
+                hasError = true;
+            }
+
+            if (!hasError) {
+                // Here you would typically make an API call to your backend
+                console.log('Logging in with:', { email, password });
+                // handleServerAuth(email, password);
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>
