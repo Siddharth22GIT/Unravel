@@ -109,19 +109,17 @@
     }
   </style>
   </head>
-<body class="bg-background text-on-surface font-body selection:bg-primary/30">
+<body class="text-on-surface font-body selection:bg-primary/30">
 <div id="main-app-container" class="transition-all duration-300">
 <!-- TopAppBar -->
 <nav class="bg-[#131313]/90 backdrop-blur-xl docked full-width top-0 sticky z-50 shadow-[0_0_20px_rgba(146,204,255,0.1)]">
 <div class="flex justify-between items-center px-8 py-6 w-full max-w-screen-2xl mx-auto">
-<div class="flex items-center gap-4">
+<a href="index.html" class="flex items-center gap-4 cursor-pointer hover:opacity-80 transition-opacity">
 <span class="material-symbols-outlined text-[#92CCFF]" data-icon="terminal">terminal</span>
 <span class="text-[#E5E2E1] font-extrabold tracking-tighter text-2xl font-headline">UNRAVEL</span>
-</div>
+</a>
 <div class="hidden md:flex items-center gap-12">
-<a class="font-headline tracking-tighter uppercase font-bold text-xl text-[#E5E2E1]/50 hover:text-[#92CCFF] transition-colors duration-300" href="#">Explore</a>
 <a class="font-headline tracking-tighter uppercase font-bold text-xl text-[#92CCFF] hover:text-[#92CCFF] transition-colors duration-300" href="#">The Grind</a>
-<a class="font-headline tracking-tighter uppercase font-bold text-xl text-[#E5E2E1]/50 hover:text-[#92CCFF] transition-colors duration-300" href="#">About</a>
 </div>
 <div class="flex items-center gap-4">
 <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30 scale-95 active:scale-90 transition-transform cursor-pointer">
@@ -132,8 +130,10 @@
 </nav>
 <main class="relative min-h-screen pb-32">
 <!-- Background Texture -->
-<div class="absolute inset-0 z-[-1] opacity-20 pointer-events-none">
-<img alt="Background" class="w-full h-full object-cover" data-alt="Deep space nebula with ethereal swirls of cerulean blue and obsidian clouds with tiny distant starlight glimmers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAObN7FgkWYUEVNv3lP3iimef35JCqc22qSPxonGxIuYaRQNw0_fy73me1QJ1rsGc5vL21MDjpbDOirbBZfXvH3Mi4cIDYUU8CDlEnSvg6_F3QqZbpr09rQwkRItiGvhTiHUnicGeyWGLy0PAnRBl9zxAsYCExHw4N00lgJR8t1InD-8Ix2iH3BRee2PjZAtHj0IUL8ndUQiHg5FxI7o5oVsZJI_a3rL7ZMy8_f2iGDEL531N_IW5eM4Cu7z_C7DxsUt9ZI4nUdtZoT"/>
+<div class="fixed inset-0 z-[-1] pointer-events-none">
+<video autoplay loop muted playsinline class="w-full h-full object-cover">
+<source src="../images/aboutBackground.mp4" type="video/mp4"/>
+</video>
 </div>
 <!-- Hero Section -->
 <header class="max-w-screen-2xl mx-auto px-8 pt-24 pb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -171,8 +171,8 @@
 <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/15 Completed</span>
 </div>
 </div>
-<button onclick="showQuestions('newBorn')" class="w-full mt-8 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-[0.2em] border border-tertiary/30 hover:bg-tertiary hover:text-on-tertiary transition-all duration-300 active:scale-95">
-                        START
+<button onclick="showQuestions('newBorn')" class="w-full mt-8 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-[0.2em] bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:brightness-110 transition-all duration-300 active:scale-95">
+                        GET BORN
                     </button>
 </div>
 <!-- Decorative Light Leak -->
@@ -224,7 +224,7 @@
 <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/5 Completed</span>
 </div>
 </div>
-<button onclick="showQuestions('master')" class="relative z-10 w-full mt-8 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-[0.2em] bg-on-surface text-background shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:bg-white transition-all duration-300 active:scale-95">
+<button onclick="showQuestions('master')" class="relative z-10 w-full mt-8 py-4 rounded-xl font-label text-sm font-bold uppercase tracking-[0.2em] bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-500 text-black shadow-[0_0_30px_rgba(234,179,8,0.4)] hover:shadow-[0_0_40px_rgba(234,179,8,0.6)] hover:brightness-110 transition-all duration-300 active:scale-95">
                         ASCEND
                     </button>
 </div>
@@ -267,17 +267,9 @@
 <!-- BottomNavBar -->
 <nav class="fixed bottom-0 w-full z-50 rounded-t-[2rem] bg-[#131313]/95 backdrop-blur-2xl md:hidden">
 <div class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-8 pt-4">
-<div class="flex flex-col items-center justify-center text-[#E5E2E1]/40 px-6 py-2 transition-all hover:text-[#E5E2E1]">
-<span class="material-symbols-outlined mb-1" data-icon="explore">explore</span>
-<span class="font-['Inter'] text-[10px] uppercase tracking-widest font-semibold">Explore</span>
-</div>
 <div class="flex flex-col items-center justify-center text-[#92CCFF] bg-[#2A2A2A] rounded-2xl px-6 py-2 shadow-[0_0_15px_rgba(146,204,255,0.2)] transition-all">
 <span class="material-symbols-outlined mb-1" data-icon="terminal">terminal</span>
 <span class="font-['Inter'] text-[10px] uppercase tracking-widest font-semibold">The Grind</span>
-</div>
-<div class="flex flex-col items-center justify-center text-[#E5E2E1]/40 px-6 py-2 transition-all hover:text-[#E5E2E1]">
-<span class="material-symbols-outlined mb-1" data-icon="info">info</span>
-<span class="font-['Inter'] text-[10px] uppercase tracking-widest font-semibold">About</span>
 </div>
 </div>
 </nav>
