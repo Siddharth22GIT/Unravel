@@ -4,6 +4,9 @@
 // Required installs (run in /src):
 // npm install express mongoose bcryptjs cors
 
+require('dotenv').config();
+
+// console.log("ENV CHECK:", process.env.MONGODB_URI);
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
@@ -11,19 +14,23 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-
+// require('dotenv').config();
 // Middleware
 app.use(cors());
 app.use(express.json());
+// app.use(express.static('client/pages'));
+app.use(express.static(path.join(__dirname, '../client/pages')));
 
 // Serve your frontend pages
 app.use(express.static(path.join(__dirname, '../client/pages')));
 app.use('/images', express.static(path.join(__dirname, '../client/images')));
 
 // ---- MongoDB Connection ----
-mongoose.connect('mongodb+srv://siddharthmishra10e_db_user:Unravel01@cluster0.scaxg1g.mongodb.net/?appName=Cluster0')
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log('MongoDB error:', err));
+// console.log("Mongo URI:", process.env.MONGODB_URI);
+
 // ---- User Schema ----
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -89,4 +96,106 @@ app.post('/api/auth/login', async (req, res) => {
 
 // ---- Start Server ----
 const PORT = process.env.PORT || 3000;
+
+// ---- CODE ANALYZER LOGIC ----
+app.post('/api/analyze', (req, res) => {
+    const { code } = req.body;
+
+    if (!code) {
+        return res.status(400).json({ message: "No code provided" });
+    }
+
+    try {
+        const lines = code.split('\n');
+
+        let currentDepth = 0;
+        let maxDepth = 0;
+        let hasRecursion = false;
+        let hasLogN = false;
+
+        // detect function name
+        const funcMatch = code.match(/(int|void|float|double|string)\s+(\w+)\s*\(/);
+        const functionName = funcMatch ? funcMatch[2] : null;
+
+        for (let line of lines) {
+            line = line.trim();
+
+            // LOOP DETECTION
+            if (line.startsWith("for") || line.startsWith("while")) {
+                currentDepth++;
+                maxDepth = Math.max(maxDepth, currentDepth);
+
+                // detect log n pattern (i = i/2 or i *= 2)
+                if (line.includes("/=") || line.includes("*=")) {
+                    hasLogN = true;
+                }
+            }
+
+            // BLOCK CLOSE
+            if (line.includes("}")) {
+                currentDepth = Math.max(0, currentDepth - 1);
+            }
+
+            
+
+            // // RECURSION DETECTION
+            // if (functionName && line.includes(functionName + "(") && !line.startsWith(functionName)) {
+            //     hasRecursion = true;
+            // }
+            // RECURSION DETECTION (BETTER)
+if (functionName) {
+    const callPattern = new RegExp(`\\b${functionName}\\s*\\(`);
+
+    if (callPattern.test(line) && !line.match(/(int|void|float|double|string)\s+\w+\s*\(/)) {
+        hasRecursion = true;
+    }
+}
+        }
+
+        // ---- DECISION LOGIC ----
+        let time = "O(1)";
+        let space = "O(1)";
+        let explanation = "";
+
+        if (hasRecursion) {
+            time = "O(2^n)";
+            explanation = "Recursive calls detected (likely exponential).";
+        }
+        else if (hasLogN && maxDepth === 1) {
+            time = "O(log n)";
+            explanation = "Loop reduces input size (logarithmic).";
+        }
+        else if (hasLogN && maxDepth === 2) {
+            time = "O(n log n)";
+            explanation = "Nested loop with logarithmic inner loop.";
+        }
+        else if (maxDepth === 1) {
+            time = "O(n)";
+            explanation = "Single loop detected.";
+        }
+        else if (maxDepth === 2) {
+            time = "O(n^2)";
+            explanation = "Two nested loops detected.";
+        }
+        else if (maxDepth >= 3) {
+            time = `O(n^${maxDepth})`;
+            explanation = `${maxDepth} nested loops detected.`;
+        }
+        else {
+            explanation = "No loops detected.";
+        }
+
+        const result = `
+Time Complexity: ${time}
+Space Complexity: ${space}
+Explanation: ${explanation}
+        `;
+
+        res.json({ result });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Analysis failed" });
+    }
+});
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
