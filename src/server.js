@@ -1,15 +1,11 @@
-// =============================================
-// PASTE THIS INTO YOUR EXISTING server.js
-// =============================================
-// Required installs (run in /src):
-// npm install express mongoose bcryptjs cors
 
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
-
+const { exec } = require("child_process");
+const fs = require("fs");
 const app = express();
 
 // Middleware
@@ -86,6 +82,27 @@ app.post('/api/auth/login', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+app.post("/run", (req, res) => {
+    const code = req.body.code;
+
+    fs.writeFileSync("temp.cpp", code);
+
+    exec("g++ temp.cpp -o temp.exe", (compileErr, _, compileStderr) => {
+        if (compileErr) {
+            return res.json({ error: compileStderr });
+        }
+
+        exec("temp.exe", (runErr, stdout, stderr) => {
+            if (runErr) {
+                return res.json({ error: stderr });
+            }
+
+            res.json({ output: stdout });
+        });
+    });
+});
+
 
 // ---- Start Server ----
 const PORT = process.env.PORT || 3000;
