@@ -9,9 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
     <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
         rel="stylesheet">
-    <!-- Google Sign In Script -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         * {
@@ -26,8 +25,6 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0px;
-            padding: 0px;
         }
 
         video {
@@ -48,21 +45,6 @@
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.774);
             width: 100%;
             max-width: 400px;
-        }
-
-
-        #email {
-            opacity: 70%;
-            color: rgb(0, 0, 0);
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        #password {
-            opacity: 70%;
-            color: rgb(0, 0, 0);
-            font-weight: 500;
-            cursor: pointer;
         }
 
         h1 {
@@ -94,6 +76,7 @@
         .google-btn {
             width: 100%;
             padding: 0.8rem;
+            background: white;
             opacity: 70%;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -101,17 +84,22 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: opacity 0.3s;
             gap: 10px;
         }
 
         .google-btn:hover {
-            background: #f5f5f5;
+            opacity: 90%;
         }
 
         .google-btn img {
             width: 20px;
             height: 20px;
+        }
+
+        .google-btn span {
+            font-size: 1rem;
+            color: #333;
         }
 
         .form-group {
@@ -130,11 +118,13 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
+            opacity: 70%;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: #3498db;
+            opacity: 100%;
         }
 
         .login-btn {
@@ -153,125 +143,244 @@
             background: #2980b9;
         }
 
+        .signup-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 0.8rem;
+        }
+
+        .signup-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         .error-message {
             color: #e74c3c;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
             display: none;
+        }
+
+        .success-message {
+            color: #2ecc71;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+            display: none;
+            text-align: center;
+        }
+
+        /* Toggle between login/signup */
+        #signupSection {
+            display: none;
+        }
+
+        .toggle-text {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .toggle-text span {
+            color: #3498db;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        #googleBtnHidden {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
         }
     </style>
 </head>
 
 <body>
-
     <video src="../images/aboutBackground.mp4" autoplay muted loop></video>
+
+    <div id="g_id_onload" data-client_id="577870694438-s1lnste9u0m3prfsrcbu2dpd4hvj62gn.apps.googleusercontent.com"
+        data-callback="handleGoogleCredentialResponse" data-auto_prompt="false">
+    </div>
+    <div id="googleBtnHidden">
+        <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="continue_with"
+            data-shape="rectangular">
+        </div>
+    </div>
+
     <div class="login-container">
-        <h1>Welcome Back</h1>
+        <h1 id="formTitle">Welcome Back</h1>
 
         <button class="google-btn" onclick="handleGoogleSignIn()">
             <img src="../images/images-removebg-preview.png" alt="Google Logo">
             <span>Continue with Google</span>
         </button>
 
-        <div class="divider">
-            <span>or</span>
+        <div class="divider"><span>or</span></div>
+
+        <!-- LOGIN SECTION -->
+        <div id="loginSection">
+            <div class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="you@example.com" required>
+                <div class="error-message" id="loginEmailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" required>
+                <div class="error-message" id="loginPasswordError"></div>
+            </div>
+            <div class="success-message" id="loginSuccess"></div>
+            <button class="login-btn" onclick="handleEmailLogin()">Log In</button>
+            <p class="toggle-text">Not a member yet? <span onclick="showSignup()">Sign-up real quick</span></p>
         </div>
 
-        <form id="loginForm" onsubmit="handleEmailLogin(event)">
+        <!-- SIGNUP SECTION -->
+        <div id="signupSection">
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" required>
-                <div class="error-message" id="emailError"></div>
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" placeholder="John Doe" required>
+                <div class="error-message" id="signupNameError"></div>
             </div>
-
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required>
-                <div class="error-message" id="passwordError"></div>
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="you@example.com" required>
+                <div class="error-message" id="signupEmailError"></div>
             </div>
-
-            <button type="submit" class="login-btn">Log In</button>
-        </form>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" placeholder="Min. 6 characters" required>
+                <div class="error-message" id="signupPasswordError"></div>
+            </div>
+            <div class="success-message" id="signupSuccess"></div>
+            <button class="login-btn" onclick="handleSignup()">Create Account</button>
+            <p class="toggle-text">Already a member? <span onclick="showLogin()">Log in</span></p>
+        </div>
     </div>
 
     <script>
-        // Initialize Google client
-        let googleClient;
+        // If already logged in, redirect to index
+        if (localStorage.getItem('user')) {
+            window.location.href = 'index.html';
+        }
 
-        window.onload = function () {
-            // Initialize the client
-            googleClient = google.accounts.oauth2.initTokenClient({
-                client_id: '577870694438-4dqu366240hkidg5bhcbcgedc5h3hr2k.apps.googleusercontent.com',
-                scope: 'email profile',
-                callback: handleGoogleCredentialResponse
-            });
-        };
-
-        // Handle Google Sign-In button click
         function handleGoogleSignIn() {
-            googleClient.requestAccessToken();
+            google.accounts.id.prompt();
         }
 
-        // Handle Google Sign-In response
         function handleGoogleCredentialResponse(response) {
-            if (response.access_token) {
-                // Fetch user details using the access token
-                fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                    headers: {
-                        'Authorization': `Bearer ${response.access_token}`
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Logged in as:', data.name);
-                        // Here you would typically send the token to your backend
-                        // handleServerAuth(response.access_token);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching user info:', error);
-                    });
+            const idToken = response.credential;
+            const payload = JSON.parse(atob(idToken.split('.')[1]));
+
+            // Store user in localStorage
+            localStorage.setItem('user', JSON.stringify({
+                name: payload.name,
+                email: payload.email,
+                picture: payload.picture,
+                provider: 'google'
+            }));
+
+            window.location.href = 'index.html';
+        }
+
+        async function handleEmailLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            clearErrors(['loginEmailError', 'loginPasswordError']);
+
+            let hasError = false;
+            if (!isValidEmail(email)) { showError('loginEmailError', 'Please enter a valid email'); hasError = true; }
+            if (password.length < 6) { showError('loginPasswordError', 'Password must be at least 6 characters'); hasError = true; }
+            if (hasError) return;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('user', JSON.stringify({ name: data.name, email: data.email, provider: 'email' }));
+                    window.location.href = 'index.html';
+                } else {
+                    showError('loginPasswordError', data.message || 'Invalid credentials');
+                }
+            } catch (err) {
+                showError('loginPasswordError', 'Server error. Try again.');
             }
         }
 
-        // Handle Email Login
-        function handleEmailLogin(event) {
-            event.preventDefault();
+        async function handleSignup() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            clearErrors(['signupNameError', 'signupEmailError', 'signupPasswordError']);
 
-            // Reset error messages
-            document.getElementById('emailError').style.display = 'none';
-            document.getElementById('passwordError').style.display = 'none';
-
-            // Basic validation
             let hasError = false;
+            if (name.length < 2) { showError('signupNameError', 'Please enter your name'); hasError = true; }
+            if (!isValidEmail(email)) { showError('signupEmailError', 'Please enter a valid email'); hasError = true; }
+            if (password.length < 6) { showError('signupPasswordError', 'Password must be at least 6 characters'); hasError = true; }
+            if (hasError) return;
 
-            if (!isValidEmail(email)) {
-                showError('emailError', 'Please enter a valid email address');
-                hasError = true;
-            }
+            try {
+                const res = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await res.json();
 
-            if (password.length < 6) {
-                showError('passwordError', 'Password must be at least 6 characters');
-                hasError = true;
+                if (res.ok) {
+                    localStorage.setItem('user', JSON.stringify({ name: data.name, email: data.email, provider: 'email' }));
+                    window.location.href = 'index.html';
+                } else {
+                    showError('signupEmailError', data.message || 'Signup failed');
+                }
+            } catch (err) {
+                showError('signupEmailError', 'Server error. Try again.');
             }
+        }
 
-            if (!hasError) {
-                // Here you would typically make an API call to your backend
-                console.log('Logging in with:', { email, password });
-                // handleServerAuth(email, password);
-            }
+        function showSignup() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('signupSection').style.display = 'block';
+            document.getElementById('formTitle').textContent = 'Join Unravel';
+        }
+
+        function showLogin() {
+            document.getElementById('signupSection').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('formTitle').textContent = 'Welcome Back';
         }
 
         function isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
-        function showError(elementId, message) {
-            const errorElement = document.getElementById(elementId);
-            errorElement.textContent = message;
-            errorElement.style.display = 'block';
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function clearErrors(ids) {
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                el.textContent = '';
+                el.style.display = 'none';
+            });
         }
     </script>
 </body>

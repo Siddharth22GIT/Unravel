@@ -139,7 +139,6 @@
 <!-- Hero Section -->
 <header class="max-w-screen-2xl mx-auto px-8 pt-24 pb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
 <div class="space-y-4">
-<span class="font-label text-xs uppercase tracking-[0.4em] text-primary/60 block">Phase 01 — Terminal Induction</span>
 <h1 class="font-headline text-[clamp(3.5rem,10vw,6rem)] leading-[0.9] font-bold tracking-tighter uppercase italic">
                 Grind<br/> <span class="text-gradient-primary"></span>
 </h1>
@@ -287,7 +286,7 @@
             </button>
         </div>
         <div class="flex items-center gap-2">
-            <button class="flex items-center gap-2 px-4 py-1.5 rounded bg-surface-variant hover:bg-primary/20 text-primary transition-colors font-label text-sm">
+            <button class="flex items-center gap-2 px-4 py-1.5 rounded bg-surface-variant hover:bg-primary/20 text-primary transition-colors font-label text-sm" onclick="runCode()">
                 <span class="material-symbols-outlined text-sm">play_arrow</span> Run
             </button>
             <button class="flex items-center gap-2 px-4 py-1.5 rounded bg-primary text-on-primary hover:brightness-110 transition-colors font-label text-sm font-bold shadow-[0_0_15px_rgba(146,204,255,0.3)]">
@@ -396,6 +395,91 @@ public:
 <!-- Ace Editor -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
 <script>
+
+    async function runCode() {
+    const code = editor.getValue();
+
+    const response = await fetch("https://ce.judge0.com/submissions?wait=true", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            language_id: 54, // C++ (GCC 9.2)
+            source_code: code,
+            stdin: "" // optional input
+        })
+    });
+
+    const data = await response.json();
+
+    updateConsole(data);
+}
+
+function updateConsole(data) {
+    const consoleBox = document.querySelector(".space-y-4");
+
+    if (data.compile_output) {
+        consoleBox.innerHTML = `<div class="text-red-400">${data.compile_output}</div>`;
+        return;
+    }
+
+    if (data.stderr) {
+        consoleBox.innerHTML = `<div class="text-red-400">${data.stderr}</div>`;
+        return;
+    }
+
+    consoleBox.innerHTML = `
+        <div class="text-green-400">
+            ${data.stdout || "No Output"}
+        </div>
+    `;
+}
+
+
+async function submitCode() {
+    const code = editor.getValue();
+
+    const testCases = [
+        { input: "2 7 11 15\n9", expected: "0 1" },
+        { input: "3 2 4\n6", expected: "1 2" }
+    ];
+
+    let results = [];
+
+    for (let i = 0; i < testCases.length; i++) {
+        const res = await fetch("https://ce.judge0.com/submissions?wait=true", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                language_id: 54,
+                source_code: code,
+                stdin: testCases[i].input
+            })
+        });
+
+        const data = await res.json();
+
+        const output = data.stdout?.trim() || "";
+        const passed = output === testCases[i].expected;
+
+        results.push({
+            case: i + 1,
+            passed,
+            output
+        });
+    }
+
+    updateConsole(results);
+}
+
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    if (!currentUser) {
+        alert('You need to be a member first!');
+        window.location.href = 'login.html';
+    }
     let editor;
     
     // Initialize Editor once the page loads

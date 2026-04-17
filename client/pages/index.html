@@ -8,9 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 </head>
 <style>
     body {
@@ -18,7 +16,6 @@
         margin: 0%;
         background-color: black;
     }
-
 
     video {
         position: fixed;
@@ -83,7 +80,6 @@
         font-weight: 520;
         font-family: "Poppins", sans-serif;
         text-shadow: 0 0 90px rgb(255, 255, 255);
-
     }
 
     .main h1 {
@@ -95,7 +91,6 @@
     }
 
     .btn {
-        text-shadow: rgb(255, 255, 255);
         font-size: 30px;
         font-weight: bold;
         color: black;
@@ -104,16 +99,39 @@
         padding-right: 15px;
         border-radius: 25px;
         transition: transform 0.2s ease;
+        background: none;
+        border: none;
+        cursor: pointer;
     }
 
-    .btn img{
+    .btn img {
         width: 100px;
     }
 
     .btn:hover {
         transform: scale(1.1);
-        color: black;
-        text-shadow: 0 0 4px white;
+    }
+
+    /* Sign out button in nav */
+    #authNavBtn {
+        color: white;
+        text-shadow: 0 0 10px rgb(0, 0, 0);
+        text-decoration: none;
+        font-size: 18px;
+        font-family: "Poppins", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.2s ease;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+    }
+
+    #authNavBtn:hover {
+        transform: scale(1.05);
+        color: gray;
     }
 </style>
 
@@ -125,20 +143,51 @@
                 <a href="about.html">About</a>
                 <a href="grind.html">Grind</a>
                 <a href="know_your_code.html">Know your &lt;/&gt;</a>
-                <a href="login.html">Sign-in</a>
+                <button id="authNavBtn" onclick="handleAuthNav()">Sign-in</button>
             </nav>
         </div>
 
         <div class="main">
             <h1>Unravel</h1>
-            <p>“Master DSA patterns, write smarter code, and <br> instantly analyze its time and space complexity — all
-                in one place.”</p>
-                <a href="" class="btn"><img src="../images/computer.png" alt=""></a>
+            <p>"Master DSA patterns, write smarter code, and <br> instantly analyze its time and space complexity — all in one place."</p>
+            <button class="btn" onclick="handleGrind()">
+                <img src="../images/computer.png" alt="Grind">
+            </button>
         </div>
-        <div class="footer">
 
-        </div>
+        <div class="footer"></div>
     </div>
-</body>
 
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        // Update nav button based on login state
+        const authBtn = document.getElementById('authNavBtn');
+        if (user) {
+            authBtn.textContent = 'Sign-out';
+        } else {
+            authBtn.textContent = 'Sign-in';
+        }
+
+        function handleAuthNav() {
+            if (user) {
+                // Sign out
+                localStorage.removeItem('user');
+                window.location.reload();
+            } else {
+                window.location.href = 'login.html';
+            }
+        }
+
+        function handleGrind() {
+            const currentUser = JSON.parse(localStorage.getItem('user'));
+            if (currentUser) {
+                window.location.href = 'grind.html';
+            } else {
+                alert('You need to be a member first!');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
 </html>
