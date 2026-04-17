@@ -119,7 +119,6 @@
     </nav>
     
     <!-- Main layout -->
-
     <div class="flex flex-1 overflow-hidden p-2 gap-2 min-h-0 flex-col md:flex-row">
         <!-- Left Panel: Problem Description -->
         <div class="w-full md:w-5/12 bg-surface-container-low rounded-lg border border-outline-variant/20 flex flex-col overflow-hidden">
@@ -149,7 +148,6 @@
         
         <!-- Right Panel: Code & Console -->
         <div class="w-full md:w-7/12 flex flex-col gap-2 overflow-hidden h-full">
-            
             <!-- Code Editor -->
             <div class="flex-1 bg-surface-container-low rounded-lg border border-outline-variant/20 flex flex-col overflow-hidden min-h-0">
                 <div class="flex items-center justify-between px-4 py-2 border-b border-outline-variant/20 bg-surface-container-high/50 shrink-0">
@@ -162,20 +160,17 @@
                         <span class="material-symbols-outlined text-on-surface-variant text-sm hover:text-on-surface cursor-pointer">fullscreen</span>
                     </div>
                 </div>
-
-                <!-- Language Selector -->
+                <!-- Language Selector / Analyze Actions -->
                 <div class="px-4 py-2 border-b border-outline-variant/10 flex items-center justify-between shrink-0">
                    <button class="flex items-center gap-2 text-sm font-label text-on-surface-variant hover:text-on-surface transition-colors bg-surface-variant px-3 py-1 rounded">
                        C++ <span class="material-symbols-outlined text-[16px]">expand_more</span>
                    </button>
 
-                   <button class="flex items-center gap-2 px-4 py-1.5 rounded bg-gradient-to-r from-primary to-primary-container text-on-primary hover:brightness-110 transition-colors font-label text-sm font-bold shadow-[0_0_15px_rgba(146,204,255,0.3)] hover:shadow-[0_0_20px_rgba(146,204,255,0.5)]" onclick="analyzeCode()">
-                       <span class="material-symbols-outlined text-sm" >memory</span> Analyze Code
+                   <button class="flex items-center gap-2 px-4 py-1.5 rounded bg-gradient-to-r from-primary to-primary-container text-on-primary hover:brightness-110 transition-colors font-label text-sm font-bold shadow-[0_0_15px_rgba(146,204,255,0.3)] hover:shadow-[0_0_20px_rgba(146,204,255,0.5)]">
+                       <span class="material-symbols-outlined text-sm">memory</span> Analyze Code
                    </button>
-
                 </div>
-                
-                <!-- Editor Area -->
+                <!-- Editor Area (Ace Editor) -->
                 <div class="flex-1 relative bg-[#1e1e1e]">
                     <div id="code-editor" class="absolute inset-0 text-base"></div>
                 </div>
@@ -204,7 +199,6 @@
         editor = ace.edit("code-editor");
         editor.setTheme("ace/theme/tomorrow_night_eighties");
         editor.session.setMode("ace/mode/c_cpp");
-
         editor.setOptions({
             fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
             fontSize: "14px",
@@ -214,36 +208,10 @@
             wrap: true,
             useWorker: false
         });
-
         
         const placeholderCode = `// Paste your code here to analyze its complexity\n\n#include <iostream>\n\nint main() {\n    for (int i = 0; i < 10; i++) {\n        std::cout << "Unravel the logic!\\\\n";\n    }\n    return 0;\n}`;
         editor.setValue(placeholderCode, -1);
     });
-
- async function analyzeCode() {
-    const code = editor.getValue();
-    const outputDiv = document.querySelector(".font-mono");
-
-    outputDiv.innerHTML = "Analyzing...";
-
-    try {
-        const res = await fetch("/api/analyze", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ code })
-        });
-
-        const data = await res.json();
-
-        outputDiv.innerHTML = `<pre>${data.result}</pre>`;
-    } catch (err) {
-        outputDiv.innerHTML = "Error analyzing code.";
-        console.error(err);
-    }
-}
-
 </script>
 </body>
 </html>
