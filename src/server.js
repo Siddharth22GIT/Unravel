@@ -138,10 +138,7 @@ app.post('/api/analyze', (req, res) => {
 
             
 
-            // // RECURSION DETECTION
-            // if (functionName && line.includes(functionName + "(") && !line.startsWith(functionName)) {
-            //     hasRecursion = true;
-            // }
+          
             // RECURSION DETECTION (BETTER)
 if (functionName) {
     const callPattern = new RegExp(`\\b${functionName}\\s*\\(`);
@@ -197,5 +194,72 @@ Explanation: ${explanation}
         console.error(err);
         res.status(500).json({ message: "Analysis failed" });
     }
+});
+
+// ---- RUN C++ CODE ROUTE ----
+const { exec } = require("child_process");
+const fs = require("fs");
+
+app.post("/api/run", (req, res) => {
+    const { code, input } = req.body;
+
+    const uniqueId = Date.now();
+
+    const filePath = path.join(__dirname, `temp_${uniqueId}.cpp`);
+    const exePath = path.join(__dirname, `temp_${uniqueId}.exe`);
+
+    fs.writeFileSync(filePath, code);
+
+    // Step 1: Compile
+    exec(`g++ "${filePath}" -o "${exePath}"`, (compileErr, _, compileStderr) => {
+
+        if (compileErr) {
+            return res.json({
+                success: false,
+                type: "compile",
+                output: compileStderr
+            });
+        }
+
+        // Step 2: Run WITH TIMEOUT
+        const runProcess = exec(exePath, { timeout: 3000 }, (runErr, stdout, stderr) => {
+
+            if (runErr) {
+                if (runErr.killed) {
+                    return res.json({
+                        success: false,
+                        output: "Execution timed out (possible infinite loop)"
+                    });
+                }
+
+                return res.json({
+                    success: false,
+                    type: "runtime",
+                    output: stderr
+                });
+            }
+
+            res.json({
+                success: true,
+                output: stdout
+            });
+
+            // ✅ DELAYED CLEANUP (FIXES EPERM)
+            setTimeout(() => {
+                try {
+                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+                    if (fs.existsSync(exePath)) fs.unlinkSync(exePath);
+                } catch (err) {
+                    console.log("Cleanup error:", err.message);
+                }
+            }, 1000);
+        });
+
+        // ✅ FIX INPUT (IMPORTANT)
+        if (input) {
+            runProcess.stdin.write(input + "\n");
+            runProcess.stdin.end();
+        }
+    });
 });
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
