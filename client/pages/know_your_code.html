@@ -4,246 +4,387 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>UNRAVEL | Know Your Code</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "inverse-on-surface": "#313030",
-                      "inverse-primary": "#006397",
-                      "tertiary-fixed-dim": "#c3c7c8",
-                      "surface-container-low": "#1c1b1b",
-                      "primary-container": "#3498db",
-                      "surface-container-lowest": "#0e0e0e",
-                      "on-primary-container": "#002d47",
-                      "on-secondary": "#203243",
-                      "error-container": "#93000a",
-                      "tertiary-container": "#8d9293",
-                      "secondary": "#b5c8df",
-                      "surface-variant": "#353534",
-                      "on-tertiary": "#2c3132",
-                      "on-secondary-fixed": "#091d2e",
-                      "on-secondary-fixed-variant": "#36485b",
-                      "on-secondary-container": "#a4b7cd",
-                      "surface-dim": "#131313",
-                      "on-error": "#690005",
-                      "on-primary-fixed": "#001d31",
-                      "outline": "#89929b",
-                      "on-background": "#e5e2e1",
-                      "background": "#131313",
-                      "primary-fixed-dim": "#92ccff",
-                      "surface-container-high": "#2a2a2a",
-                      "primary-fixed": "#cce5ff",
-                      "error": "#ffb4ab",
-                      "on-tertiary-fixed-variant": "#434849",
-                      "on-error-container": "#ffdad6",
-                      "on-primary-fixed-variant": "#004b73",
-                      "surface-container-highest": "#353534",
-                      "primary": "#92ccff",
-                      "tertiary-fixed": "#dfe3e4",
-                      "surface": "#131313",
-                      "secondary-fixed": "#d1e4fb",
-                      "secondary-fixed-dim": "#b5c8df",
-                      "on-surface": "#e5e2e1",
-                      "secondary-container": "#36485b",
-                      "on-tertiary-fixed": "#181c1d",
-                      "on-tertiary-container": "#262b2c",
-                      "on-primary": "#003351",
-                      "surface-tint": "#92ccff",
-                      "outline-variant": "#3f4850",
-                      "on-surface-variant": "#bfc7d2",
-                      "inverse-surface": "#e5e2e1",
-                      "tertiary": "#c3c7c8",
-                      "surface-container": "#201f1f",
-                      "surface-bright": "#3a3939"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.125rem",
-                      "lg": "0.25rem",
-                      "xl": "0.5rem",
-                      "full": "0.75rem"
-              },
-              "fontFamily": {
-                      "headline": [
-                              "Space Grotesk"
-                      ],
-                      "body": [
-                              "Manrope"
-                      ],
-                      "label": [
-                              "Inter"
-                      ]
-              }
-            },
-          },
-        }
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,600;1,700;1,800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="split-layout.css"/>
 <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .text-gradient-primary {
-            background: linear-gradient(135deg, #92CCFF 0%, #3498DB 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+  }
 </style>
 </head>
-<body class="bg-background text-on-surface font-body selection:bg-primary/30 m-0 p-0 overflow-hidden">
-<div class="fixed inset-0 z-10 flex flex-col h-screen text-on-surface bg-background">
-    <!-- Navbar -->
-    <nav class="flex items-center justify-between px-4 py-2 bg-surface-container-low border-b border-outline-variant/20 shrink-0 shadow-[0_0_20px_rgba(146,204,255,0.05)]">
-        <div class="flex items-center gap-4">
-            <a href="grind.html" class="flex items-center gap-2 hover:bg-surface-variant px-3 py-1.5 rounded transition-colors text-on-surface-variant hover:text-primary">
-                <span class="material-symbols-outlined text-sm">arrow_back_ios_new</span>
-                <span class="font-label text-sm font-semibold tracking-wide">Return</span>
-            </a>
-            <a href="index.html" class="flex items-center gap-2 ml-4 cursor-pointer hover:opacity-80 transition-opacity">
-                <!-- <span class="material-symbols-outlined text-[#92CCFF]" data-icon="terminal">terminal</span> -->
-                <span class="text-[#E5E2E1] font-extrabold tracking-tighter text-xl font-headline">UNRAVEL</span>
-            </a>
-        </div>
-        <div class="hidden md:flex items-center gap-12 font-headline tracking-tighter uppercase font-bold text-lg">
-            <a class="text-[#E5E2E1]/50 hover:text-[#92CCFF] transition-colors" href="grind.html">The Grind</a>
-            <a class="text-[#92CCFF]" href="know_your_code.html">Know Your &lt;/&gt;</a>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30 hidden md:block">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNheccznngNZUJdC6lVP9B123_FP2eWAhxYTFvpxkD9YSFLQCuzFZ-lSPdHFYsHhTID-VxFpuq77Xo8g86V_vfsgafc0gNzMipqVbMxkgzeDrkp9ubZ1AmsQg2pRb4tB0K-si2fCQcVln53zO1g4F0OnrurRMIFnQnKqqfqfJIMK_cnqwrS3Q26FwK1wt2PRWTApgwTQQ7QGh3v2Eq4FgLi-0mBFRFT12rmgbWwFpuOl2YkGKcIT32AupR3CH9J7T1qovOZFzCkH9p" class="w-full h-full object-cover">
-            </div>
-        </div>
-    </nav>
-    
-    <!-- Main layout -->
+<body>
 
-    <div class="flex flex-1 overflow-hidden p-2 gap-2 min-h-0 flex-col md:flex-row">
-        <!-- Left Panel: Problem Description -->
-        <div class="w-full md:w-5/12 bg-surface-container-low rounded-lg border border-outline-variant/20 flex flex-col overflow-hidden">
-            <div class="flex items-center gap-6 px-4 py-3 border-b border-outline-variant/20 bg-surface-container-high/50 font-label text-sm font-bold shrink-0 overflow-x-auto">
-                <span class="flex items-center gap-2 text-primary border-b-2 border-primary pb-2 -mb-[13px] whitespace-nowrap"><span class="material-symbols-outlined text-sm">psychology</span> Analyzer</span>
-                <span class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface cursor-pointer pb-2 -mb-[13px] whitespace-nowrap"><span class="material-symbols-outlined text-sm">history</span> History</span>
-            </div>
-            <div class="flex-1 overflow-y-auto p-6 font-body">
-                <h1 class="text-3xl font-bold font-headline mb-4 text-on-surface">Time & Space Complexity</h1>
-                <div class="flex flex-wrap items-center gap-3 mb-6">
-                    <span class="px-3 py-1 rounded-full bg-primary/10 text-primary font-label text-xs tracking-widest uppercase border border-primary/20">Analysis tools</span>
-                    <span class="px-3 py-1 rounded-full bg-surface-variant text-on-surface-variant font-label text-xs flex items-center gap-1 cursor-pointer"><span class="material-symbols-outlined text-[14px]">bolt</span> O(N)</span>
-                </div>
-                <div class="prose prose-invert max-w-none text-on-surface-variant space-y-4">
-                    <p>Paste any custom snippet, function, or full script into the editor on the right and click <strong>Analyze Code</strong> down below to evaluate its Time & Space Complexity.</p>
-                    <p>This powerful engine parses loops, recursion, built-in functions, and data structures to output a complete breakdown of Big-O notations.</p>
-                    
-                    <div class="bg-surface-container-highest p-4 rounded-lg border border-outline-variant/10 mt-8 mb-4">
-                        <div class="flex items-center gap-2 text-on-surface font-bold text-sm mb-2">
-                            <span class="material-symbols-outlined text-primary text-[18px]">info</span> Supported Languages
-                        </div>
-                        <p class="text-sm">We currently heavily support <strong>C++, Python, JavaScript, and Java</strong>.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right Panel: Code & Console -->
-        <div class="w-full md:w-7/12 flex flex-col gap-2 overflow-hidden h-full">
-            
-            <!-- Code Editor -->
-            <div class="flex-1 bg-surface-container-low rounded-lg border border-outline-variant/20 flex flex-col overflow-hidden min-h-0">
-                <div class="flex items-center justify-between px-4 py-2 border-b border-outline-variant/20 bg-surface-container-high/50 shrink-0">
-                    <div class="flex items-center gap-2 text-primary font-label text-sm font-bold">
-                        <span class="material-symbols-outlined text-sm">code</span> Code Editor
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-on-surface-variant text-sm hover:text-on-surface cursor-pointer" onclick="editor.setValue('')">delete</span>
-                        <span class="material-symbols-outlined text-on-surface-variant text-sm hover:text-on-surface cursor-pointer">settings</span>
-                        <span class="material-symbols-outlined text-on-surface-variant text-sm hover:text-on-surface cursor-pointer">fullscreen</span>
-                    </div>
-                </div>
+<div id="app">
+  <div id="drag-overlay"></div>
 
-                <!-- Language Selector -->
-                <div class="px-4 py-2 border-b border-outline-variant/10 flex items-center justify-between shrink-0">
-                   <button class="flex items-center gap-2 text-sm font-label text-on-surface-variant hover:text-on-surface transition-colors bg-surface-variant px-3 py-1 rounded">
-                       C++ <span class="material-symbols-outlined text-[16px]">expand_more</span>
-                   </button>
-
-                   <button class="flex items-center gap-2 px-4 py-1.5 rounded bg-gradient-to-r from-primary to-primary-container text-on-primary hover:brightness-110 transition-colors font-label text-sm font-bold shadow-[0_0_15px_rgba(146,204,255,0.3)] hover:shadow-[0_0_20px_rgba(146,204,255,0.5)]" onclick="analyzeCode()">
-                       <span class="material-symbols-outlined text-sm" >memory</span> Analyze Code
-                   </button>
-
-                </div>
-                
-                <!-- Editor Area -->
-                <div class="flex-1 relative bg-[#1e1e1e]">
-                    <div id="code-editor" class="absolute inset-0 text-base"></div>
-                </div>
-            </div>
-            
-            <!-- Analysis Console -->
-            <div class="h-64 bg-surface-container-low rounded-lg border border-outline-variant/20 flex flex-col overflow-hidden shrink-0">
-                <div class="flex items-center gap-6 px-4 py-2 border-b border-outline-variant/20 bg-surface-container-high/50 font-label text-sm font-bold overflow-x-auto">
-                    <span class="flex items-center gap-2 text-tertiary border-b-2 border-tertiary pb-1 -mb-[9px] whitespace-nowrap"><span class="material-symbols-outlined text-sm text-[#4ec9b0]">terminal</span> Output</span>
-                </div>
-                <div class="flex-1 p-4 overflow-auto font-mono text-sm">
-                    <div class="text-on-surface-variant italic opacity-70">Awaiting code analysis...</div>
-                </div>
-            </div>
-        </div>
+  <!-- ── Navbar ── -->
+  <nav class="ws-nav">
+    <div class="nav-left">
+      <a href="index.html" class="nav-logo">UNRAVEL</a>
+      <div class="nav-sep"></div>
+      <a href="grind.html" class="nav-back">
+        <span class="material-symbols-outlined" style="font-size:13px!important">arrow_back_ios_new</span>
+        Problem List
+      </a>
     </div>
+    <div class="nav-center">
+      <button class="nav-btn ghost" id="btn-run" onclick="runCode()">
+        <span class="material-symbols-outlined">play_arrow</span> Run
+      </button>
+      <button class="nav-btn primary" id="btn-analyze" onclick="analyzeCode()">
+        <span class="material-symbols-outlined">memory</span> Analyze
+      </button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="grind.html"          class="nav-link">The Grind</a>
+        <a href="know_your_code.html" class="nav-link active">Know Your &lt;/&gt;</a>
+      </div>
+      <button class="icon-btn"><span class="material-symbols-outlined">settings</span></button>
+      <div class="avatar">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNheccznngNZUJdC6lVP9B123_FP2eWAhxYTFvpxkD9YSFLQCuzFZ-lSPdHFYsHhTID-VxFpuq77Xo8g86V_vfsgafc0gNzMipqVbMxkgzeDrkp9ubZ1AmsQg2pRb4tB0K-si2fCQcVln53zO1g4F0OnrurRMIFnQnKqqfqfJIMK_cnqwrS3Q26FwK1wt2PRWTApgwTQQ7QGh3v2Eq4FgLi-0mBFRFT12rmgbWwFpuOl2YkGKcIT32AupR3CH9J7T1qovOZFzCkH9p" alt=""/>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Split Layout ── -->
+  <div class="split-container" id="split-container">
+
+    <!-- LEFT: Analyzer Info + History + Complexity Cards -->
+    <div class="panel panel-left" id="panel-left" style="width:380px;flex:0 0 380px;">
+      <div class="panel-tabs">
+        <button class="tab-btn" data-tab="analyzer">
+          <span class="material-symbols-outlined">psychology</span> Analyzer
+        </button>
+        <button class="tab-btn" data-tab="history">
+          <span class="material-symbols-outlined">history</span> History
+          <span id="history-count" style="display:none;background:rgba(146,204,255,0.15);color:#92ccff;border-radius:100px;font-size:10px;padding:1px 6px;margin-left:2px;">0</span>
+        </button>
+      </div>
+
+      <div class="panel-body">
+
+        <!-- Analyzer tab -->
+        <div data-panel="analyzer" class="tab-panel">
+          <div class="desc-body">
+            <h1>Time &amp; Space Complexity</h1>
+            <div class="badge-row">
+              <span class="badge medium">Analysis Tools</span>
+              <span class="badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">bolt</span> O(N)</span>
+            </div>
+            <p>Paste any snippet, function, or full script into the editor on the right.</p>
+            <p>Hit <strong>Run</strong> to execute first, then <strong>Analyze</strong> for the full Big-O breakdown.</p>
+            <p style="color:#4ec9b0;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:14px!important;color:#4ec9b0;">info</span>
+              Complexity only appears when your code runs without errors.
+            </p>
+
+            <div class="info-box">
+              <div class="info-head">
+                <span class="material-symbols-outlined" style="color:#92ccff;font-size:14px!important">info</span>
+                Supported Languages
+              </div>
+              <p style="font-size:13px;color:#9aa3ad;margin:0;line-height:1.6;">
+                Full support for <strong style="color:#e5e2e1">C++, Python, JavaScript</strong> and <strong style="color:#e5e2e1">Java</strong>.
+              </p>
+            </div>
+
+            <!-- Complexity cards — hidden until analyze succeeds -->
+            <div id="complexity-section" style="display:none;" class="complexity-section">
+              <div class="complexity-title">
+                <span class="material-symbols-outlined" style="color:#4ec9b0;font-size:14px!important">check_circle</span>
+                Complexity Results
+              </div>
+              <div class="complexity-card time">
+                <div>
+                  <div class="card-label">Time Complexity</div>
+                  <div id="time-complexity" class="card-value">—</div>
+                </div>
+                <span class="material-symbols-outlined card-icon" style="color:#92ccff">schedule</span>
+              </div>
+              <div class="complexity-card space" style="animation-delay:0.06s">
+                <div>
+                  <div class="card-label">Space Complexity</div>
+                  <div id="space-complexity" class="card-value">—</div>
+                </div>
+                <span class="material-symbols-outlined card-icon" style="color:#c3c7c8">memory</span>
+              </div>
+              <div class="explanation-card">
+                <div class="exp-label">Explanation</div>
+                <div id="complexity-explanation">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- History tab -->
+        <div data-panel="history" class="tab-panel" style="flex-direction:column;">
+          <div id="history-list"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider-v" id="divider-v"></div>
+
+    <!-- RIGHT: Editor + Input + Output -->
+    <div class="panel-right right-split" id="panel-right">
+
+      <!-- Editor -->
+      <div class="editor-section panel" id="editor-section">
+        <div class="panel-tabs">
+          <button class="tab-btn active" style="color:var(--primary);border-bottom-color:var(--primary);">
+            <span class="material-symbols-outlined">code</span> Code Editor
+          </button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:4px;padding-right:8px;">
+            <button class="icon-btn" title="Clear" onclick="editor&&editor.setValue('', -1)">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+            <button class="icon-btn" title="Reset to placeholder" onclick="resetEditor()">
+              <span class="material-symbols-outlined">refresh</span>
+            </button>
+          </div>
+        </div>
+        <div class="editor-lang-bar">
+          <button class="lang-selector">
+            C++ <span class="material-symbols-outlined" style="font-size:14px!important">expand_more</span>
+          </button>
+        </div>
+        <div id="ace-container">
+          <div id="code-editor"></div>
+        </div>
+      </div>
+
+      <div class="divider-h" id="divider-h"></div>
+
+      <!-- Bottom: Input / Output / Raw Analysis -->
+      <div class="bottom-section" id="bottom-section" style="height:230px;">
+        <div class="panel-tabs">
+          <button class="tab-btn teal active" data-tab="custom-input">
+            <span class="material-symbols-outlined" style="color:#4ec9b0">edit_note</span> Custom Input
+          </button>
+          <button class="tab-btn" data-tab="output">
+            <span class="material-symbols-outlined">terminal</span> Output
+          </button>
+          <button class="tab-btn" data-tab="raw-analysis">
+            <span class="material-symbols-outlined">psychology</span> Raw Analysis
+          </button>
+        </div>
+
+        <div data-panel="custom-input" class="tab-panel active">
+          <textarea id="input-box" class="stdin-area" placeholder="Enter custom input (stdin)…"></textarea>
+        </div>
+
+        <div data-panel="output" class="tab-panel">
+          <div class="output-area">
+            <div id="output-content" class="placeholder">Run your code to see output here.</div>
+          </div>
+        </div>
+
+        <div data-panel="raw-analysis" class="tab-panel">
+          <div class="output-area">
+            <div id="raw-analysis-content" class="placeholder">Analyze your code to see the full breakdown here.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<!-- Ace Editor -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+<script src="split-layout.js"></script>
 <script>
-    let editor;
-    
-    // Initialize Editor once the page loads
-    document.addEventListener("DOMContentLoaded", function() {
-        editor = ace.edit("code-editor");
-        editor.setTheme("ace/theme/tomorrow_night_eighties");
-        editor.session.setMode("ace/mode/c_cpp");
+let editor;
+let lastRunSuccess = false;
+let leftTabs, bottomTabs;
 
-        editor.setOptions({
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-            fontSize: "14px",
-            showPrintMargin: false,
-            highlightActiveLine: true,
-            highlightGutterLine: true,
-            wrap: true,
-            useWorker: false
-        });
+const PLACEHOLDER =
+`// Paste your code here to analyze its complexity
 
-        
-        const placeholderCode = `// Paste your code here to analyze its complexity\n\n#include <iostream>\n\nint main() {\n    for (int i = 0; i < 10; i++) {\n        std::cout << "Unravel the logic!\\\\n";\n    }\n    return 0;\n}`;
-        editor.setValue(placeholderCode, -1);
-    });
+#include <iostream>
+using namespace std;
 
- async function analyzeCode() {
-    const code = editor.getValue();
-    const outputDiv = document.querySelector(".font-mono");
-
-    outputDiv.innerHTML = "Analyzing...";
-
-    try {
-        const res = await fetch("/api/analyze", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ code })
-        });
-
-        const data = await res.json();
-
-        outputDiv.innerHTML = `<pre>${data.result}</pre>`;
-    } catch (err) {
-        outputDiv.innerHTML = "Error analyzing code.";
-        console.error(err);
+int main() {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << i * j << "\\n";
+        }
     }
+    return 0;
+}`;
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('workspace-active'); // always workspace — lock body scroll
+  // Init Ace
+  editor = ace.edit('code-editor');
+  editor.setTheme('ace/theme/tomorrow_night_eighties');
+  editor.session.setMode('ace/mode/c_cpp');
+  editor.setOptions({
+    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+    fontSize: '13.5px',
+    showPrintMargin: false,
+    highlightActiveLine: true,
+    highlightGutterLine: false,
+    wrap: true, useWorker: false,
+  });
+  editor.setValue(PLACEHOLDER, -1);
+  window._aceEditor = editor;
+
+  // Init resize
+  SplitLayout.initVerticalDivider(
+    document.getElementById('divider-v'),
+    document.getElementById('panel-left'),
+    document.getElementById('split-container')
+  );
+  SplitLayout.initHorizontalDivider(
+    document.getElementById('divider-h'),
+    document.getElementById('editor-section'),
+    document.getElementById('bottom-section'),
+    document.getElementById('panel-right')
+  );
+
+  // Init tabs
+  leftTabs   = SplitLayout.initTabs(document.getElementById('panel-left'),    'analyzer');
+  bottomTabs = SplitLayout.initTabs(document.getElementById('bottom-section'), 'custom-input');
+
+  // Render initial history
+  refreshHistory();
+});
+
+function resetEditor() {
+  if (editor) editor.setValue(PLACEHOLDER, -1);
 }
 
+/* ── Tab helpers ── */
+function setBottomTab(tabId) { bottomTabs.activate(tabId); }
+function setLeftTab(tabId)   { leftTabs.activate(tabId); }
+
+/* ── History helpers ── */
+function refreshHistory() {
+  SplitLayout.History.render(
+    document.getElementById('history-list'),
+    item => {
+      // Clicking a history entry restores its complexity cards
+      document.getElementById('time-complexity').textContent  = item.time  || '—';
+      document.getElementById('space-complexity').textContent = item.space || '—';
+      document.getElementById('complexity-explanation').textContent = item.explanation || '—';
+      document.getElementById('complexity-section').style.display = 'block';
+      setLeftTab('analyzer');
+    }
+  );
+  // Update badge count
+  const count = SplitLayout.History.get().length;
+  const badge = document.getElementById('history-count');
+  badge.style.display = count > 0 ? 'inline' : 'none';
+  badge.textContent   = count;
+}
+
+/* ── Run Code ── */
+async function runCode() {
+  const code  = editor.getValue();
+  const input = document.getElementById('input-box')?.value || '';
+
+  setBottomTab('output');
+  document.getElementById('output-content').innerHTML =
+    '<span style="color:#9aa3ad;opacity:0.5">Running…</span>';
+  lastRunSuccess = false;
+  document.getElementById('complexity-section').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, input }),
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      document.getElementById('output-content').innerHTML =
+        `<pre class="out-error">${esc(data.output)}</pre>`;
+      lastRunSuccess = false;
+    } else {
+      document.getElementById('output-content').innerHTML =
+        `<pre class="out-success">${esc(data.output || '(no output)')}</pre>`;
+      lastRunSuccess = true;
+    }
+  } catch (e) {
+    document.getElementById('output-content').innerHTML =
+      `<pre class="out-error">Network error: ${esc(e.message)}</pre>`;
+    lastRunSuccess = false;
+  }
+}
+
+/* ── Analyze Code ── */
+async function analyzeCode() {
+  if (!lastRunSuccess) {
+    setBottomTab('output');
+    document.getElementById('output-content').innerHTML = `
+      <div class="out-warn">
+        <span class="material-symbols-outlined" style="font-size:15px!important;color:#fbbf24">warning</span>
+        Run your code successfully first — errors must be fixed before analysis.
+      </div>`;
+    return;
+  }
+
+  const code = editor.getValue();
+  setBottomTab('raw-analysis');
+  document.getElementById('raw-analysis-content').innerHTML =
+    '<span style="color:#9aa3ad;opacity:0.5">Analyzing complexity…</span>';
+  document.getElementById('complexity-section').style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const data = await res.json();
+
+    document.getElementById('raw-analysis-content').innerHTML =
+      `<pre style="color:#e5e2e1">${esc(data.result || JSON.stringify(data, null, 2))}</pre>`;
+
+    // Parse complexity values
+    const timeVal  = data.timeComplexity  || extractBigO(data.result, 'time');
+    const spaceVal = data.spaceComplexity || extractBigO(data.result, 'space');
+    const expText  = data.explanation     || data.result || '—';
+
+    document.getElementById('time-complexity').textContent  = timeVal  || '—';
+    document.getElementById('space-complexity').textContent = spaceVal || '—';
+    document.getElementById('complexity-explanation').textContent = expText;
+    document.getElementById('complexity-section').style.display = 'block';
+
+    // ── Save to session history ──
+    const snippet = code.split('\n').find(l => l.trim().length > 5) || code.slice(0, 80);
+    SplitLayout.History.add({
+      time:        timeVal  || '—',
+      space:       spaceVal || '—',
+      explanation: expText,
+      snippet:     snippet.trim(),
+      lang:        'C++',
+    });
+    refreshHistory();
+
+    // Switch left panel to show results
+    setLeftTab('analyzer');
+
+  } catch (e) {
+    document.getElementById('raw-analysis-content').innerHTML =
+      `<pre class="out-error">Network error: ${esc(e.message)}</pre>`;
+  }
+}
+
+/* ── Helpers ── */
+function extractBigO(text, type) {
+  if (!text) return null;
+  const m = text.match(new RegExp(type + '[^:]*:\\s*(O\\([^)]+\\))', 'i'));
+  return m ? m[1] : null;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
 </body>
 </html>
