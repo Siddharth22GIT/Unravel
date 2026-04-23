@@ -71,7 +71,10 @@
     --surface-highest: #353534; --outline: #3f4850; --primary: #92ccff;
     --primary-dim: #3498db; --on-primary: #003351; --tertiary: #c3c7c8;
     --on-surface: #e5e2e1; --on-surface-var: #9aa3ad; --teal: #4ec9b0;
-    --green: #4ade80; --red: #f87171; --yellow: #fbbf24;
+    /* ── VIVID result colors ── */
+    --green:  #22ff88;
+    --red:    #ff4d6d;
+    --yellow: #ffcb30;
     --font-display: 'Barlow Condensed', sans-serif;
     --font-body: 'Barlow', sans-serif;
     --font-mono: 'JetBrains Mono', 'ui-monospace', monospace;
@@ -99,6 +102,8 @@
   .nav-btn.ghost:hover { background:rgba(146,204,255,0.1); border-color:rgba(146,204,255,0.28); }
   .nav-btn.primary { background:var(--primary); color:var(--on-primary); box-shadow:0 0 12px rgba(146,204,255,0.2); }
   .nav-btn.primary:hover { filter:brightness(1.08); box-shadow:0 0 18px rgba(146,204,255,0.33); }
+  .nav-btn.analyze-btn { background: linear-gradient(135deg, #4ec9b0, #2a9d8f); color:#001a16; box-shadow:0 0 12px rgba(78,201,176,0.3); }
+  .nav-btn.analyze-btn:hover { filter:brightness(1.1); box-shadow:0 0 20px rgba(78,201,176,0.5); }
   .nav-btn:disabled { opacity:0.5; cursor:not-allowed; }
   .nav-links { display:flex; align-items:center; gap:40px; }
   .nav-link { font-family:var(--font-display); font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:0.1em; text-decoration:none; color:rgba(229,226,225,0.38); transition:color 0.2s; white-space:nowrap; }
@@ -122,6 +127,8 @@
   .tab-btn:hover { color:var(--on-surface); }
   .tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
   .tab-btn.active.teal { color:var(--teal); border-bottom-color:var(--teal); }
+  .tab-btn.active.complexity-tab { color:#4ec9b0; border-bottom-color:#4ec9b0; }
+  .tab-btn.active.history-tab { color:#ffcb30; border-bottom-color:#ffcb30; }
   .panel-body { flex:1; overflow-y:auto; overflow-x:hidden; }
   .right-split { display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
   .editor-section { flex:1 1 auto; display:flex; flex-direction:column; overflow:hidden; min-height:80px; }
@@ -169,22 +176,227 @@
   #drag-overlay.col { cursor:col-resize; }
   #drag-overlay.row { cursor:row-resize; }
 
-  /* Test result cards */
-  .tc-card { border-radius:6px; border:1px solid rgba(63,72,80,0.28); margin-bottom:8px; overflow:hidden; }
-  .tc-header { display:flex; align-items:center; gap:8px; padding:8px 14px; font-family:var(--font-body); font-size:12px; font-weight:700; cursor:pointer; transition:background 0.15s; }
-  .tc-header:hover { background:rgba(63,72,80,0.15); }
-  .tc-header.pass { background:rgba(74,222,128,0.06); border-left:3px solid var(--green); }
-  .tc-header.fail { background:rgba(248,113,113,0.06); border-left:3px solid var(--red); }
-  .tc-header.err  { background:rgba(251,191,36,0.06); border-left:3px solid var(--yellow); }
-  .tc-body { padding:10px 14px; background:rgba(20,20,20,0.4); display:none; font-family:var(--font-mono); font-size:11.5px; line-height:1.8; }
-  .tc-body.open { display:block; }
-  .tc-row-label { color:var(--on-surface-var); font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px; }
-  .tc-row-val { color:var(--on-surface); margin-bottom:8px; }
+  /* ══════════════════════════════════
+     VIVID Test result cards
+  ══════════════════════════════════ */
+  .tc-card {
+    border-radius:8px;
+    border:1px solid rgba(63,72,80,0.3);
+    margin-bottom:10px;
+    overflow:hidden;
+    transition: border-color 0.2s;
+  }
+  .tc-header {
+    display:flex; align-items:center; gap:9px; padding:10px 16px;
+    font-family:var(--font-body); font-size:12.5px; font-weight:700;
+    cursor:pointer; transition:background 0.15s;
+    position: relative;
+  }
+  .tc-header::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  }
+  .tc-header:hover { filter: brightness(1.1); }
 
-  .result-summary { display:flex; align-items:center; gap:10px; padding:10px 14px; font-family:var(--font-body); font-size:13px; font-weight:700; border-radius:6px; margin-bottom:12px; }
-  .result-summary.all-pass { background:rgba(74,222,128,0.08); color:var(--green); border:1px solid rgba(74,222,128,0.2); }
-  .result-summary.some-fail { background:rgba(248,113,113,0.08); color:var(--red); border:1px solid rgba(248,113,113,0.2); }
-  .result-summary.compile-err { background:rgba(251,191,36,0.08); color:var(--yellow); border:1px solid rgba(251,191,36,0.2); }
+  /* PASS — vivid green */
+  .tc-header.pass {
+    background: rgba(34,255,136,0.08);
+    border-left: 3px solid var(--green);
+  }
+  .tc-card:has(.tc-header.pass) { border-color: rgba(34,255,136,0.25); }
+  .tc-header.pass .tc-status-icon { color: var(--green); filter: drop-shadow(0 0 6px var(--green)); }
+  .tc-header.pass .tc-label { color: var(--green); font-weight:800; }
+  .tc-header.pass .tc-sublabel { color: rgba(34,255,136,0.6); }
+
+  /* FAIL — vivid red */
+  .tc-header.fail {
+    background: rgba(255,77,109,0.08);
+    border-left: 3px solid var(--red);
+  }
+  .tc-card:has(.tc-header.fail) { border-color: rgba(255,77,109,0.28); }
+  .tc-header.fail .tc-status-icon { color: var(--red); filter: drop-shadow(0 0 6px var(--red)); }
+  .tc-header.fail .tc-label { color: var(--red); font-weight:800; }
+  .tc-header.fail .tc-sublabel { color: rgba(255,77,109,0.65); }
+
+  /* ERROR — vivid yellow */
+  .tc-header.err {
+    background: rgba(255,203,48,0.08);
+    border-left: 3px solid var(--yellow);
+  }
+  .tc-card:has(.tc-header.err) { border-color: rgba(255,203,48,0.28); }
+  .tc-header.err .tc-status-icon { color: var(--yellow); filter: drop-shadow(0 0 6px var(--yellow)); }
+  .tc-header.err .tc-label { color: var(--yellow); font-weight:800; }
+  .tc-header.err .tc-sublabel { color: rgba(255,203,48,0.65); }
+
+  .tc-toggle-arrow { margin-left:auto; color:var(--on-surface-var); font-size:10px; font-family:var(--font-body); opacity:0.55; transition: opacity 0.15s; }
+  .tc-header:hover .tc-toggle-arrow { opacity:0.9; }
+
+  .tc-body {
+    padding:12px 16px 14px;
+    background:rgba(14,14,14,0.6);
+    display:none;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    line-height:1.9;
+    border-top: 1px solid rgba(63,72,80,0.18);
+  }
+  .tc-body.open { display:block; }
+  .tc-row-label {
+    color:var(--on-surface-var); font-size:10px; font-weight:700;
+    letter-spacing:0.09em; text-transform:uppercase; margin-bottom:3px;
+    font-family: var(--font-body);
+  }
+  .tc-row-val { color:var(--on-surface); margin-bottom:10px; }
+  .tc-row-val.expected { color: var(--green); }
+  .tc-row-val.actual-fail { color: var(--red); }
+  .tc-row-val.actual-err { color: var(--yellow); }
+
+  /* Result summary banners */
+  .result-summary {
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    font-family:var(--font-body); font-size:13px; font-weight:800;
+    border-radius:8px; margin-bottom:14px; letter-spacing:0.02em;
+    position: relative; overflow: hidden;
+  }
+  .result-summary::after {
+    content:''; position:absolute; inset:0; opacity:0.04;
+    background: radial-gradient(circle at 20% 50%, white, transparent 70%);
+    pointer-events: none;
+  }
+  .result-summary.all-pass {
+    background: rgba(34,255,136,0.1);
+    color: var(--green);
+    border: 1px solid rgba(34,255,136,0.35);
+    box-shadow: 0 0 20px rgba(34,255,136,0.12), inset 0 0 30px rgba(34,255,136,0.04);
+  }
+  .result-summary.some-fail {
+    background: rgba(255,77,109,0.1);
+    color: var(--red);
+    border: 1px solid rgba(255,77,109,0.35);
+    box-shadow: 0 0 20px rgba(255,77,109,0.12), inset 0 0 30px rgba(255,77,109,0.04);
+  }
+  .result-summary.compile-err {
+    background: rgba(255,203,48,0.1);
+    color: var(--yellow);
+    border: 1px solid rgba(255,203,48,0.35);
+    box-shadow: 0 0 20px rgba(255,203,48,0.12), inset 0 0 30px rgba(255,203,48,0.04);
+  }
+  .result-summary .material-symbols-outlined { font-size:18px!important; }
+
+  /* Pass score pill */
+  .score-pill {
+    margin-left: auto;
+    background: rgba(0,0,0,0.3);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  /* ══════════════════════════════════
+     COMPLEXITY PANEL
+  ══════════════════════════════════ */
+  .complexity-body { padding:18px 20px 30px; }
+  .complexity-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px; text-align:center; }
+  .complexity-empty .mat-icon-large { font-size:38px!important; color:rgba(78,201,176,0.25); }
+  .complexity-empty p { font-size:13px; color:var(--on-surface-var); line-height:1.6; max-width:220px; margin:0; }
+
+  .complexity-card {
+    border-radius:9px; padding:16px 18px; margin-bottom:12px;
+    display:flex; align-items:center; justify-content:space-between;
+    border:1px solid;
+    position:relative; overflow:hidden;
+  }
+  .complexity-card::before {
+    content:''; position:absolute; inset:0; opacity:0.05;
+    background: radial-gradient(circle at 90% 50%, white, transparent 65%);
+    pointer-events:none;
+  }
+  .complexity-card.time {
+    background: rgba(146,204,255,0.07);
+    border-color: rgba(146,204,255,0.22);
+  }
+  .complexity-card.space {
+    background: rgba(196,201,200,0.07);
+    border-color: rgba(196,201,200,0.18);
+  }
+  .complexity-card .card-label {
+    font-family:var(--font-body); font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.09em; color:var(--on-surface-var);
+    margin-bottom:5px;
+  }
+  .complexity-card .card-value {
+    font-family:var(--font-display); font-size:26px; font-weight:800;
+    letter-spacing:0.01em;
+  }
+  .complexity-card.time .card-value { color:#92ccff; text-shadow:0 0 18px rgba(146,204,255,0.4); }
+  .complexity-card.space .card-value { color:#c3c7c8; text-shadow:0 0 18px rgba(196,201,200,0.3); }
+  .complexity-card .card-icon { font-size:28px!important; opacity:0.4; }
+
+  .explanation-card {
+    background:rgba(63,72,80,0.15); border:1px solid rgba(63,72,80,0.22);
+    border-radius:8px; padding:14px 16px; margin-top:4px;
+  }
+  .explanation-card .exp-label {
+    font-family:var(--font-body); font-size:10px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.09em; color:var(--on-surface-var);
+    margin-bottom:8px;
+  }
+  .explanation-card .exp-text {
+    font-family:var(--font-body); font-size:13px; color:var(--on-surface-var);
+    line-height:1.7;
+  }
+  .complexity-analyzing {
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-body); font-size:13px; color:#4ec9b0;
+    padding:16px 0 8px;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spin { animation: spin 1s linear infinite; display:inline-block; }
+
+  .analyze-prompt {
+    background: linear-gradient(135deg, rgba(78,201,176,0.08), rgba(78,201,176,0.04));
+    border: 1px solid rgba(78,201,176,0.2); border-radius:9px;
+    padding:14px 16px; margin-top:14px; display:flex; align-items:center; gap:10px;
+  }
+  .analyze-prompt .material-symbols-outlined { color:#4ec9b0; font-size:15px!important; flex-shrink:0; }
+  .analyze-prompt p { margin:0; font-size:12px; color:rgba(78,201,176,0.8); line-height:1.5; font-family:var(--font-body); }
+
+  /* ══════════════════════════════════
+     HISTORY PANEL
+  ══════════════════════════════════ */
+  .history-body { display:flex; flex-direction:column; }
+  .history-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px; text-align:center; }
+  .history-empty .mat-icon-large { font-size:38px!important; color:rgba(255,203,48,0.2); }
+  .history-empty p { font-size:13px; color:var(--on-surface-var); line-height:1.6; max-width:220px; margin:0; }
+
+  .history-item {
+    padding:14px 18px; border-bottom:1px solid rgba(63,72,80,0.14);
+    cursor:pointer; transition:background 0.15s;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .history-item:hover { background:rgba(63,72,80,0.12); }
+  .history-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .history-item-title { font-family:var(--font-display); font-size:14px; font-weight:700; color:var(--on-surface); }
+  .history-item-time { font-size:10px; color:var(--on-surface-var); font-family:var(--font-body); }
+  .history-item-chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .history-chip {
+    padding:2px 9px; border-radius:100px; font-size:10px; font-weight:700;
+    font-family:var(--font-body); letter-spacing:0.05em; text-transform:uppercase;
+  }
+  .chip-pass { background:rgba(34,255,136,0.1); color:var(--green); border:1px solid rgba(34,255,136,0.25); }
+  .chip-fail { background:rgba(255,77,109,0.1); color:var(--red); border:1px solid rgba(255,77,109,0.25); }
+  .chip-score { background:rgba(63,72,80,0.3); color:var(--on-surface-var); border:1px solid rgba(63,72,80,0.3); }
+
+  .history-badge-row { display:flex; align-items:center; gap:6px; }
+  .history-count-badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:16px; height:16px; padding:0 5px;
+    background:rgba(255,203,48,0.15); color:#ffcb30;
+    border-radius:100px; font-size:10px; font-weight:800;
+    font-family:var(--font-body); letter-spacing:0.02em;
+    margin-left:4px;
+  }
 
   @media (max-width: 768px) {
     .split-container { flex-direction:column; }
@@ -209,12 +421,6 @@
       <div class="hidden md:flex items-center gap-12">
         <a class="font-headline tracking-tighter uppercase font-bold text-xl text-[#92CCFF] hover:text-[#92CCFF] transition-colors duration-300" href="#">Grind</a>
         <a class="font-headline tracking-tighter uppercase font-bold text-xl text-[#E5E2E1]/50 hover:text-[#92CCFF] transition-colors duration-300" href="know_your_code.html">Know Your &lt;/&gt;</a>
-      </div>
-      <div class="flex items-center gap-4">
-        <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30 scale-95 active:scale-90 transition-transform cursor-pointer">
-          <img alt="User Profile" class="w-full h-full object-cover"
-               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNheccznngNZUJdC6lVP9B123_FP2eWAhxYTFvpxkD9YSFLQCuzFZ-lSPdHFYsHhTID-VxFpuq77Xo8g86V_vfsgafc0gNzMipqVbMxkgzeDrkp9ubZ1AmsQg2pRb4tB0K-si2fCQcVln53zO1g4F0OnrurRMIFnQnKqqfqfJIMK_cnqwrS3Q26FwK1wt2PRWTApgwTQQ7QGh3v2Eq4FgLi-0mBFRFT12rmgbWwFpuOl2YkGKcIT32AupR3CH9J7T1qovOZFzCkH9p"/>
-        </div>
       </div>
     </div>
   </nav>
@@ -388,6 +594,9 @@
       <button class="nav-btn primary" id="submit-btn" onclick="submitCode()">
         <span class="material-symbols-outlined">cloud_upload</span> Submit
       </button>
+      <button class="nav-btn analyze-btn" id="analyze-btn" onclick="analyzeCode()">
+        <span class="material-symbols-outlined">memory</span> Analyze
+      </button>
     </div>
     <div class="nav-right">
       <div class="nav-links">
@@ -401,25 +610,81 @@
   </nav>
 
   <div class="split-container" id="split-container">
-    <!-- LEFT: Problem Description -->
+    <!-- LEFT: Problem Description + Complexity + History -->
     <div class="panel panel-left" id="panel-left" style="width:420px;flex:0 0 420px;">
       <div class="panel-tabs">
-        <button class="tab-btn active" data-tab="description"><span class="material-symbols-outlined">description</span> Description</button>
-        <button class="tab-btn" data-tab="editorial"><span class="material-symbols-outlined">lightbulb</span> Editorial</button>
-        <button class="tab-btn" data-tab="solutions"><span class="material-symbols-outlined">science</span> Solutions</button>
+        <button class="tab-btn active" data-tab="description">
+          <span class="material-symbols-outlined">description</span> Description
+        </button>
+        <button class="tab-btn complexity-tab" data-tab="complexity">
+          <span class="material-symbols-outlined">memory</span> Complexity
+        </button>
+        <button class="tab-btn history-tab" data-tab="history">
+          <span class="material-symbols-outlined">history</span> History
+          <span id="ws-history-count" style="display:none;" class="history-count-badge">0</span>
+        </button>
       </div>
       <div class="panel-body">
+
+        <!-- Description tab -->
         <div data-panel="description" class="tab-panel active">
-          <div class="desc-body" id="ws-desc-body">
-            <!-- Populated dynamically -->
+          <div class="desc-body" id="ws-desc-body"></div>
+        </div>
+
+        <!-- Complexity tab -->
+        <div data-panel="complexity" class="tab-panel">
+          <div class="complexity-body">
+            <div style="margin-bottom:14px;">
+              <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:0.02em;color:var(--on-surface);margin-bottom:6px;">
+                Complexity Analysis
+              </div>
+              <p style="font-size:13px;color:var(--on-surface-var);margin:0;line-height:1.6;">
+                Hit <strong style="color:#4ec9b0">Analyze</strong> in the navbar after running your code to get a full Big-O breakdown powered by AI.
+              </p>
+            </div>
+
+            <div id="complexity-placeholder" class="complexity-empty">
+              <span class="material-symbols-outlined mat-icon-large">query_stats</span>
+              <p>No analysis yet.<br/>Run your code, then press <strong style="color:#4ec9b0">Analyze</strong> to see time &amp; space complexity.</p>
+            </div>
+
+            <div id="complexity-results" style="display:none;">
+              <div id="complexity-analyzing" class="complexity-analyzing" style="display:none;">
+                <span class="material-symbols-outlined spin">refresh</span>
+                Analyzing your code…
+              </div>
+              <div class="complexity-card time" id="comp-time-card">
+                <div>
+                  <div class="card-label">Time Complexity</div>
+                  <div id="comp-time-value" class="card-value">—</div>
+                </div>
+                <span class="material-symbols-outlined card-icon" style="color:#92ccff">schedule</span>
+              </div>
+              <div class="complexity-card space" id="comp-space-card">
+                <div>
+                  <div class="card-label">Space Complexity</div>
+                  <div id="comp-space-value" class="card-value">—</div>
+                </div>
+                <span class="material-symbols-outlined card-icon" style="color:#c3c7c8">memory</span>
+              </div>
+              <div class="explanation-card">
+                <div class="exp-label">Explanation</div>
+                <div id="comp-explanation" class="exp-text">—</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div data-panel="editorial" class="tab-panel">
-          <div class="desc-body"><h1>Editorial</h1><p>Editorial walkthroughs unlock after attempting the problem.</p></div>
+
+        <!-- History tab -->
+        <div data-panel="history" class="tab-panel">
+          <div id="ws-history-list" class="history-body">
+            <div class="history-empty">
+              <span class="material-symbols-outlined mat-icon-large">history_toggle_off</span>
+              <p>No submissions yet.<br/>Hit <strong style="color:#ffcb30">Submit</strong> to see your history here.</p>
+            </div>
+          </div>
         </div>
-        <div data-panel="solutions" class="tab-panel">
-          <div class="desc-body"><h1>Community Solutions</h1><p>Browse solutions after solving the problem.</p></div>
-        </div>
+
       </div>
     </div>
 
@@ -486,7 +751,7 @@
 
 <script>
 /* ════════════════════════════════════════════════════════
-   SPLIT LAYOUT (inline — no external file needed)
+   SPLIT LAYOUT
 ════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -555,13 +820,6 @@
 
 /* ════════════════════════════════════════════════════════
    QUESTIONS DATA
-   Each question has:
-     - id, title, topic, difficulty, diffClass
-     - description (HTML)
-     - examples: [{ input, output, explanation? }]
-     - constraints: string[]
-     - testCases: [{ label, vars: [{name, value}], stdin, expectedOutput }]
-     - starterCode: { cpp: string }
 ════════════════════════════════════════════════════════ */
 const QUESTIONS = {
   newBorn: [
@@ -583,10 +841,6 @@ const QUESTIONS = {
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
 
-// Implement twoSum:
-// Read n, then n integers, then target from stdin.
-// Print the two 0-based indices separated by a space.
-
 vector<int> twoSum(vector<int>& nums, int target) {
     // Your code here
     
@@ -604,12 +858,8 @@ int main() {
     },
     {
       id: 2, title: "Reverse a String", topic: "Strings", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Write a function that reverses a string. The input is a single line string <code>s</code>.</p>
-<p>Print the reversed string.</p>`,
-      examples: [
-        { input: "hello",   output: "olleh" },
-        { input: "Hannah",  output: "hannaH" },
-      ],
+      description: `<p>Write a function that reverses a string. The input is a single line string <code>s</code>.</p><p>Print the reversed string.</p>`,
+      examples: [{ input: "hello", output: "olleh" }, { input: "Hannah", output: "hannaH" }],
       constraints: ["1 ≤ s.length ≤ 10⁵", "s consists of printable ASCII characters."],
       testCases: [
         { label:"Case 1", vars:[{name:"s",value:"\"hello\""}],   stdin:"hello",   expectedOutput:"olleh" },
@@ -618,29 +868,16 @@ int main() {
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
-    string s;
-    cin >> s;
+    string s; cin >> s;
     // Reverse and print
-    
     return 0;
 }` }
     },
     {
       id: 3, title: "FizzBuzz", topic: "Math", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given an integer <code>n</code>, for each number from 1 to <code>n</code>:</p>
-<ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;">
-  <li>Print <strong>FizzBuzz</strong> if divisible by both 3 and 5.</li>
-  <li>Print <strong>Fizz</strong> if divisible by 3.</li>
-  <li>Print <strong>Buzz</strong> if divisible by 5.</li>
-  <li>Otherwise print the number itself.</li>
-</ul>
-<p>Each answer on a separate line.</p>`,
-      examples: [
-        { input: "n = 5", output: "1\n2\nFizz\n4\nBuzz" },
-        { input: "n = 15", output: "...FizzBuzz" },
-      ],
+      description: `<p>Given an integer <code>n</code>, for each number from 1 to <code>n</code>:</p><ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;"><li>Print <strong>FizzBuzz</strong> if divisible by both 3 and 5.</li><li>Print <strong>Fizz</strong> if divisible by 3.</li><li>Print <strong>Buzz</strong> if divisible by 5.</li><li>Otherwise print the number itself.</li></ul>`,
+      examples: [{ input: "n = 5", output: "1\n2\nFizz\n4\nBuzz" }],
       constraints: ["1 ≤ n ≤ 10⁴"],
       testCases: [
         { label:"Case 1", vars:[{name:"n",value:"5"}],  stdin:"5",  expectedOutput:"1\n2\nFizz\n4\nBuzz" },
@@ -649,316 +886,240 @@ int main() {
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     for (int i = 1; i <= n; i++) {
         // Your code here
-        
     }
     return 0;
 }` }
     },
     {
       id: 4, title: "Palindrome Check", topic: "Strings", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given a string <code>s</code>, determine if it is a palindrome (reads the same forwards and backwards, case-insensitive, ignoring non-alphanumeric characters).</p>
-<p>Print <code>true</code> if palindrome, <code>false</code> otherwise.</p>`,
-      examples: [
-        { input: "A man a plan a canal Panama", output: "true" },
-        { input: "race a car",                  output: "false" },
-      ],
+      description: `<p>Given a string <code>s</code>, determine if it is a palindrome (reads the same forwards and backwards, case-insensitive, ignoring non-alphanumeric characters).</p>`,
+      examples: [{ input: "A man a plan a canal Panama", output: "true" }, { input: "race a car", output: "false" }],
       constraints: ["1 ≤ s.length ≤ 2×10⁵"],
       testCases: [
         { label:"Case 1", vars:[{name:"s",value:"\"A man a plan a canal Panama\""}], stdin:"A man a plan a canal Panama", expectedOutput:"true" },
-        { label:"Case 2", vars:[{name:"s",value:"\"race a car\""}],                  stdin:"race a car",                  expectedOutput:"false" },
+        { label:"Case 2", vars:[{name:"s",value:"\"race a car\""}], stdin:"race a car", expectedOutput:"false" },
         { label:"Case 3", vars:[{name:"s",value:"\"Was it a car or a cat I saw\""}], stdin:"Was it a car or a cat I saw", expectedOutput:"true" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
-    string line;
-    getline(cin, line);
+    string line; getline(cin, line);
     // Filter alphanumeric, lowercase, check palindrome
-    
     return 0;
 }` }
     },
     {
       id: 5, title: "Maximum Subarray", topic: "Dynamic Programming", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given an integer array <code>nums</code>, find the subarray with the largest sum and return its sum.</p>
-<p><em>(Kadane's Algorithm)</em></p>`,
-      examples: [
-        { input: "nums = [-2,1,-3,4,-1,2,1,-5,4]", output: "6", explanation: "Subarray [4,-1,2,1] has sum 6." },
-        { input: "nums = [1]",                       output: "1" },
-        { input: "nums = [5,4,-1,7,8]",              output: "23" },
-      ],
+      description: `<p>Given an integer array <code>nums</code>, find the subarray with the largest sum and return its sum. <em>(Kadane's Algorithm)</em></p>`,
+      examples: [{ input: "nums = [-2,1,-3,4,-1,2,1,-5,4]", output: "6", explanation: "Subarray [4,-1,2,1] has sum 6." }],
       constraints: ["1 ≤ nums.length ≤ 10⁵", "-10⁴ ≤ nums[i] ≤ 10⁴"],
       testCases: [
         { label:"Case 1", vars:[{name:"nums",value:"[-2,1,-3,4,-1,2,1,-5,4]"}], stdin:"9\n-2 1 -3 4 -1 2 1 -5 4", expectedOutput:"6" },
-        { label:"Case 2", vars:[{name:"nums",value:"[1]"}],                       stdin:"1\n1",                      expectedOutput:"1" },
-        { label:"Case 3", vars:[{name:"nums",value:"[5,4,-1,7,8]"}],              stdin:"5\n5 4 -1 7 8",              expectedOutput:"23" },
+        { label:"Case 2", vars:[{name:"nums",value:"[1]"}], stdin:"1\n1", expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"nums",value:"[5,4,-1,7,8]"}], stdin:"5\n5 4 -1 7 8", expectedOutput:"23" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     vector<int> nums(n);
     for (int& x : nums) cin >> x;
     // Kadane's algorithm — print max sum
-    
     return 0;
 }` }
     },
     {
       id: 6, title: "Missing Number", topic: "Bit Manipulation", difficulty: "Easy", diffClass: "easy",
       description: `<p>Given an array <code>nums</code> containing <code>n</code> distinct numbers in the range <code>[0, n]</code>, return the only number in the range that is missing from the array.</p>`,
-      examples: [
-        { input: "nums = [3,0,1]", output: "2" },
-        { input: "nums = [0,1]",   output: "2" },
-        { input: "nums = [9,6,4,2,3,5,7,0,1]", output: "8" },
-      ],
-      constraints: ["n == nums.length", "1 ≤ n ≤ 10⁴", "0 ≤ nums[i] ≤ n", "All nums are unique."],
+      examples: [{ input: "nums = [3,0,1]", output: "2" }],
+      constraints: ["1 ≤ n ≤ 10⁴"],
       testCases: [
-        { label:"Case 1", vars:[{name:"nums",value:"[3,0,1]"}],               stdin:"3\n3 0 1",           expectedOutput:"2" },
-        { label:"Case 2", vars:[{name:"nums",value:"[0,1]"}],                  stdin:"2\n0 1",             expectedOutput:"2" },
-        { label:"Case 3", vars:[{name:"nums",value:"[9,6,4,2,3,5,7,0,1]"}],   stdin:"9\n9 6 4 2 3 5 7 0 1", expectedOutput:"8" },
+        { label:"Case 1", vars:[{name:"nums",value:"[3,0,1]"}], stdin:"3\n3 0 1", expectedOutput:"2" },
+        { label:"Case 2", vars:[{name:"nums",value:"[0,1]"}], stdin:"2\n0 1", expectedOutput:"2" },
+        { label:"Case 3", vars:[{name:"nums",value:"[9,6,4,2,3,5,7,0,1]"}], stdin:"9\n9 6 4 2 3 5 7 0 1", expectedOutput:"8" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     vector<int> nums(n);
     for (int& x : nums) cin >> x;
     // Find missing number in [0..n] — print it
-    
     return 0;
 }` }
     },
     {
       id: 7, title: "Valid Parentheses", topic: "Stacks", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.</p>
-<p>A string is valid if every open bracket is closed by the same type in the correct order.</p>`,
-      examples: [
-        { input: "()",     output: "true" },
-        { input: "()[]{}", output: "true" },
-        { input: "(]",     output: "false" },
-      ],
-      constraints: ["1 ≤ s.length ≤ 10⁴", "s consists of parentheses only."],
+      description: `<p>Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.</p>`,
+      examples: [{ input: "()", output: "true" }, { input: "()[]{}", output: "true" }, { input: "(]", output: "false" }],
+      constraints: ["1 ≤ s.length ≤ 10⁴"],
       testCases: [
-        { label:"Case 1", vars:[{name:"s",value:"\"()\""}],     stdin:"()",     expectedOutput:"true" },
+        { label:"Case 1", vars:[{name:"s",value:"\"()\""}], stdin:"()", expectedOutput:"true" },
         { label:"Case 2", vars:[{name:"s",value:"\"()[]{}\""}, ], stdin:"()[]{}", expectedOutput:"true" },
-        { label:"Case 3", vars:[{name:"s",value:"\"(]\""}],     stdin:"(]",     expectedOutput:"false" },
+        { label:"Case 3", vars:[{name:"s",value:"\"(]\""}], stdin:"(]", expectedOutput:"false" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     string s; cin >> s;
     stack<char> st;
     // Use a stack to validate brackets
-    
     return 0;
 }` }
     },
     {
       id: 8, title: "Count Vowels", topic: "Strings", difficulty: "Easy", diffClass: "easy",
       description: `<p>Given a string <code>s</code>, count the number of vowels (<code>a, e, i, o, u</code>, case-insensitive) and print the count.</p>`,
-      examples: [
-        { input: "Hello World", output: "3" },
-        { input: "aeiou",       output: "5" },
-      ],
+      examples: [{ input: "Hello World", output: "3" }],
       constraints: ["1 ≤ s.length ≤ 10⁵"],
       testCases: [
         { label:"Case 1", vars:[{name:"s",value:"\"Hello World\""}], stdin:"Hello World", expectedOutput:"3" },
-        { label:"Case 2", vars:[{name:"s",value:"\"aeiou\""}],       stdin:"aeiou",       expectedOutput:"5" },
-        { label:"Case 3", vars:[{name:"s",value:"\"rhythm\""}],      stdin:"rhythm",      expectedOutput:"0" },
+        { label:"Case 2", vars:[{name:"s",value:"\"aeiou\""}], stdin:"aeiou", expectedOutput:"5" },
+        { label:"Case 3", vars:[{name:"s",value:"\"rhythm\""}], stdin:"rhythm", expectedOutput:"0" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
-    string line;
-    getline(cin, line);
+    string line; getline(cin, line);
     int count = 0;
-    string vowels = "aeiouAEIOU";
     // Count vowels and print count
-    
     return 0;
 }` }
     },
     {
       id: 9, title: "Sum of Digits", topic: "Math", difficulty: "Easy", diffClass: "easy",
       description: `<p>Given a non-negative integer <code>n</code>, compute and print the sum of its digits.</p>`,
-      examples: [
-        { input: "123",   output: "6" },
-        { input: "9999",  output: "36" },
-        { input: "10001", output: "2" },
-      ],
+      examples: [{ input: "123", output: "6" }],
       constraints: ["0 ≤ n ≤ 10¹⁸"],
       testCases: [
-        { label:"Case 1", vars:[{name:"n",value:"123"}],   stdin:"123",   expectedOutput:"6" },
-        { label:"Case 2", vars:[{name:"n",value:"9999"}],  stdin:"9999",  expectedOutput:"36" },
+        { label:"Case 1", vars:[{name:"n",value:"123"}], stdin:"123", expectedOutput:"6" },
+        { label:"Case 2", vars:[{name:"n",value:"9999"}], stdin:"9999", expectedOutput:"36" },
         { label:"Case 3", vars:[{name:"n",value:"10001"}], stdin:"10001", expectedOutput:"2" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     string n; cin >> n;
     int sum = 0;
     // Sum digits of n and print
-    
     return 0;
 }` }
     },
     {
       id: 10, title: "Power of Two", topic: "Bit Manipulation", difficulty: "Easy", diffClass: "easy",
       description: `<p>Given an integer <code>n</code>, return <code>true</code> if it is a power of two. Otherwise, return <code>false</code>.</p>`,
-      examples: [
-        { input: "1",  output: "true",  explanation: "2⁰ = 1" },
-        { input: "16", output: "true",  explanation: "2⁴ = 16" },
-        { input: "3",  output: "false" },
-      ],
+      examples: [{ input: "1", output: "true" }, { input: "16", output: "true" }, { input: "3", output: "false" }],
       constraints: ["-2³¹ ≤ n ≤ 2³¹ - 1"],
       testCases: [
-        { label:"Case 1", vars:[{name:"n",value:"1"}],  stdin:"1",  expectedOutput:"true" },
+        { label:"Case 1", vars:[{name:"n",value:"1"}], stdin:"1", expectedOutput:"true" },
         { label:"Case 2", vars:[{name:"n",value:"16"}], stdin:"16", expectedOutput:"true" },
-        { label:"Case 3", vars:[{name:"n",value:"3"}],  stdin:"3",  expectedOutput:"false" },
+        { label:"Case 3", vars:[{name:"n",value:"3"}], stdin:"3", expectedOutput:"false" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     long long n; cin >> n;
     // Check if n is a power of 2 and print true/false
-    
     return 0;
 }` }
     },
     {
       id: 11, title: "Fibonacci Number", topic: "Dynamic Programming", difficulty: "Easy", diffClass: "easy",
       description: `<p>Given <code>n</code>, compute <code>F(n)</code> where F(0) = 0, F(1) = 1, and F(n) = F(n-1) + F(n-2).</p>`,
-      examples: [
-        { input: "2", output: "1" },
-        { input: "3", output: "2" },
-        { input: "4", output: "3" },
-      ],
+      examples: [{ input: "4", output: "3" }],
       constraints: ["0 ≤ n ≤ 30"],
       testCases: [
-        { label:"Case 1", vars:[{name:"n",value:"2"}],  stdin:"2",  expectedOutput:"1" },
-        { label:"Case 2", vars:[{name:"n",value:"5"}],  stdin:"5",  expectedOutput:"5" },
+        { label:"Case 1", vars:[{name:"n",value:"2"}], stdin:"2", expectedOutput:"1" },
+        { label:"Case 2", vars:[{name:"n",value:"5"}], stdin:"5", expectedOutput:"5" },
         { label:"Case 3", vars:[{name:"n",value:"10"}], stdin:"10", expectedOutput:"55" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     // Compute F(n) and print
-    
     return 0;
 }` }
     },
     {
       id: 12, title: "Remove Duplicates", topic: "Arrays", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given a sorted array <code>nums</code>, remove duplicates in-place so each element appears only once. Print the resulting array elements separated by spaces.</p>`,
-      examples: [
-        { input: "nums = [1,1,2]",              output: "1 2" },
-        { input: "nums = [0,0,1,1,1,2,2,3,3,4]", output: "0 1 2 3 4" },
-      ],
-      constraints: ["1 ≤ nums.length ≤ 3×10⁴", "-100 ≤ nums[i] ≤ 100", "nums is sorted ascending."],
+      description: `<p>Given a sorted array <code>nums</code>, remove duplicates in-place. Print the resulting unique elements separated by spaces.</p>`,
+      examples: [{ input: "nums = [1,1,2]", output: "1 2" }],
+      constraints: ["1 ≤ nums.length ≤ 3×10⁴"],
       testCases: [
-        { label:"Case 1", vars:[{name:"nums",value:"[1,1,2]"}],                 stdin:"3\n1 1 2",               expectedOutput:"1 2" },
-        { label:"Case 2", vars:[{name:"nums",value:"[0,0,1,1,1,2,2,3,3,4]"}],  stdin:"10\n0 0 1 1 1 2 2 3 3 4", expectedOutput:"0 1 2 3 4" },
-        { label:"Case 3", vars:[{name:"nums",value:"[1,1,1,1]"}],               stdin:"4\n1 1 1 1",              expectedOutput:"1" },
+        { label:"Case 1", vars:[{name:"nums",value:"[1,1,2]"}], stdin:"3\n1 1 2", expectedOutput:"1 2" },
+        { label:"Case 2", vars:[{name:"nums",value:"[0,0,1,1,1,2,2,3,3,4]"}], stdin:"10\n0 0 1 1 1 2 2 3 3 4", expectedOutput:"0 1 2 3 4" },
+        { label:"Case 3", vars:[{name:"nums",value:"[1,1,1,1]"}], stdin:"4\n1 1 1 1", expectedOutput:"1" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     vector<int> nums(n);
     for (int& x : nums) cin >> x;
     // Remove duplicates and print unique elements
-    
     return 0;
 }` }
     },
     {
       id: 13, title: "Climbing Stairs", topic: "Dynamic Programming", difficulty: "Easy", diffClass: "easy",
       description: `<p>You are climbing a staircase. It takes <code>n</code> steps to reach the top. Each time you can climb 1 or 2 steps. In how many distinct ways can you climb to the top?</p>`,
-      examples: [
-        { input: "n = 2", output: "2", explanation: "1+1 or 2." },
-        { input: "n = 3", output: "3", explanation: "1+1+1, 1+2, or 2+1." },
-      ],
+      examples: [{ input: "n = 2", output: "2" }, { input: "n = 3", output: "3" }],
       constraints: ["1 ≤ n ≤ 45"],
       testCases: [
-        { label:"Case 1", vars:[{name:"n",value:"2"}],  stdin:"2",  expectedOutput:"2" },
-        { label:"Case 2", vars:[{name:"n",value:"3"}],  stdin:"3",  expectedOutput:"3" },
+        { label:"Case 1", vars:[{name:"n",value:"2"}], stdin:"2", expectedOutput:"2" },
+        { label:"Case 2", vars:[{name:"n",value:"3"}], stdin:"3", expectedOutput:"3" },
         { label:"Case 3", vars:[{name:"n",value:"10"}], stdin:"10", expectedOutput:"89" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     // Count distinct ways to climb n stairs
-    
     return 0;
 }` }
     },
     {
       id: 14, title: "Best Time to Buy Stock", topic: "Arrays", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given an array <code>prices</code> where <code>prices[i]</code> is the price on day <code>i</code>, find the maximum profit from one buy-sell transaction. If no profit is possible, return 0.</p>`,
-      examples: [
-        { input: "prices = [7,1,5,3,6,4]", output: "5", explanation: "Buy day 2 (price 1), sell day 5 (price 6)." },
-        { input: "prices = [7,6,4,3,1]",   output: "0", explanation: "Prices always fall; no profit." },
-      ],
-      constraints: ["1 ≤ prices.length ≤ 10⁵", "0 ≤ prices[i] ≤ 10⁴"],
+      description: `<p>Given an array <code>prices</code> where <code>prices[i]</code> is the price on day <code>i</code>, find the maximum profit from one buy-sell transaction.</p>`,
+      examples: [{ input: "prices = [7,1,5,3,6,4]", output: "5" }, { input: "prices = [7,6,4,3,1]", output: "0" }],
+      constraints: ["1 ≤ prices.length ≤ 10⁵"],
       testCases: [
         { label:"Case 1", vars:[{name:"prices",value:"[7,1,5,3,6,4]"}], stdin:"6\n7 1 5 3 6 4", expectedOutput:"5" },
-        { label:"Case 2", vars:[{name:"prices",value:"[7,6,4,3,1]"}],   stdin:"5\n7 6 4 3 1",   expectedOutput:"0" },
-        { label:"Case 3", vars:[{name:"prices",value:"[2,4,1]"}],        stdin:"3\n2 4 1",        expectedOutput:"2" },
+        { label:"Case 2", vars:[{name:"prices",value:"[7,6,4,3,1]"}], stdin:"5\n7 6 4 3 1", expectedOutput:"0" },
+        { label:"Case 3", vars:[{name:"prices",value:"[2,4,1]"}], stdin:"3\n2 4 1", expectedOutput:"2" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     vector<int> prices(n);
     for (int& x : prices) cin >> x;
     // Find max profit and print it
-    
     return 0;
 }` }
     },
     {
       id: 15, title: "Single Number", topic: "Bit Manipulation", difficulty: "Easy", diffClass: "easy",
-      description: `<p>Given a non-empty array of integers <code>nums</code>, every element appears <strong>twice</strong> except for one. Find that single one.</p>
-<p>Implement with <strong>O(1)</strong> extra space.</p>`,
-      examples: [
-        { input: "nums = [2,2,1]",       output: "1" },
-        { input: "nums = [4,1,2,1,2]",   output: "4" },
-        { input: "nums = [1]",            output: "1" },
-      ],
-      constraints: ["1 ≤ nums.length ≤ 3×10⁴", "-3×10⁴ ≤ nums[i] ≤ 3×10⁴", "All appear twice except one."],
+      description: `<p>Given a non-empty array of integers <code>nums</code>, every element appears <strong>twice</strong> except for one. Find that single one using <strong>O(1)</strong> extra space.</p>`,
+      examples: [{ input: "nums = [2,2,1]", output: "1" }, { input: "nums = [4,1,2,1,2]", output: "4" }],
+      constraints: ["1 ≤ nums.length ≤ 3×10⁴"],
       testCases: [
-        { label:"Case 1", vars:[{name:"nums",value:"[2,2,1]"}],     stdin:"3\n2 2 1",       expectedOutput:"1" },
-        { label:"Case 2", vars:[{name:"nums",value:"[4,1,2,1,2]"}], stdin:"5\n4 1 2 1 2",   expectedOutput:"4" },
-        { label:"Case 3", vars:[{name:"nums",value:"[1]"}],          stdin:"1\n1",            expectedOutput:"1" },
+        { label:"Case 1", vars:[{name:"nums",value:"[2,2,1]"}], stdin:"3\n2 2 1", expectedOutput:"1" },
+        { label:"Case 2", vars:[{name:"nums",value:"[4,1,2,1,2]"}], stdin:"5\n4 1 2 1 2", expectedOutput:"4" },
+        { label:"Case 3", vars:[{name:"nums",value:"[1]"}], stdin:"1\n1", expectedOutput:"1" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
     vector<int> nums(n);
     for (int& x : nums) cin >> x;
     // XOR trick — print the single number
-    
     return 0;
 }` }
     },
@@ -968,152 +1129,112 @@ int main() {
     {
       id: 1, title: "Longest Substring Without Repeating", topic: "Sliding Window", difficulty: "Medium", diffClass: "medium",
       description: `<p>Given a string <code>s</code>, find the length of the <strong>longest substring without repeating characters</strong>.</p>`,
-      examples: [
-        { input: "abcabcbb", output: "3", explanation: "\"abc\" has length 3." },
-        { input: "bbbbb",    output: "1", explanation: "\"b\" has length 1." },
-        { input: "pwwkew",   output: "3", explanation: "\"wke\" has length 3." },
-      ],
-      constraints: ["0 ≤ s.length ≤ 5×10⁴", "s consists of English letters, digits, symbols and spaces."],
+      examples: [{ input: "abcabcbb", output: "3", explanation: '"abc" has length 3.' }, { input: "bbbbb", output: "1" }, { input: "pwwkew", output: "3" }],
+      constraints: ["0 ≤ s.length ≤ 5×10⁴"],
       testCases: [
         { label:"Case 1", vars:[{name:"s",value:"\"abcabcbb\""}], stdin:"abcabcbb", expectedOutput:"3" },
-        { label:"Case 2", vars:[{name:"s",value:"\"bbbbb\""}],    stdin:"bbbbb",    expectedOutput:"1" },
-        { label:"Case 3", vars:[{name:"s",value:"\"pwwkew\""}],   stdin:"pwwkew",   expectedOutput:"3" },
+        { label:"Case 2", vars:[{name:"s",value:"\"bbbbb\""}], stdin:"bbbbb", expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"s",value:"\"pwwkew\""}], stdin:"pwwkew", expectedOutput:"3" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     string s; cin >> s;
     // Sliding window — print max length
-    
     return 0;
 }` }
     },
     {
       id: 2, title: "Add Two Numbers (Linked List)", topic: "Linked Lists", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Two non-empty linked lists represent two non-negative integers stored in <strong>reverse order</strong>. Add them and return the sum as a linked list in reverse order.</p>
-<p>Input: Two lines, each with space-separated digits (already reversed). Output: Space-separated digits of the sum list (reversed).</p>`,
-      examples: [
-        { input: "2 4 3\n5 6 4", output: "7 0 8", explanation: "342 + 465 = 807 → [7,0,8]" },
-        { input: "0\n0",          output: "0" },
-        { input: "9 9 9 9 9 9 9\n9 9 9 9", output: "8 9 9 9 0 0 0 1" },
-      ],
-      constraints: ["1 ≤ list length ≤ 100", "0 ≤ Node.val ≤ 9", "No leading zeros (except 0 itself)."],
+      description: `<p>Two non-empty linked lists represent two non-negative integers stored in <strong>reverse order</strong>. Add them and return the sum as a linked list in reverse order.</p>`,
+      examples: [{ input: "2 4 3\n5 6 4", output: "7 0 8", explanation: "342 + 465 = 807" }],
+      constraints: ["1 ≤ list length ≤ 100"],
       testCases: [
-        { label:"Case 1", vars:[{name:"l1",value:"[2,4,3]"},{name:"l2",value:"[5,6,4]"}],             stdin:"3\n2 4 3\n3\n5 6 4",           expectedOutput:"7 0 8" },
-        { label:"Case 2", vars:[{name:"l1",value:"[0]"},{name:"l2",value:"[0]"}],                       stdin:"1\n0\n1\n0",                    expectedOutput:"0" },
-        { label:"Case 3", vars:[{name:"l1",value:"[9,9,9,9,9,9,9]"},{name:"l2",value:"[9,9,9,9]"}],   stdin:"7\n9 9 9 9 9 9 9\n4\n9 9 9 9", expectedOutput:"8 9 9 9 0 0 0 1" },
+        { label:"Case 1", vars:[{name:"l1",value:"[2,4,3]"},{name:"l2",value:"[5,6,4]"}], stdin:"3\n2 4 3\n3\n5 6 4", expectedOutput:"7 0 8" },
+        { label:"Case 2", vars:[{name:"l1",value:"[0]"},{name:"l2",value:"[0]"}], stdin:"1\n0\n1\n0", expectedOutput:"0" },
+        { label:"Case 3", vars:[{name:"l1",value:"[9,9,9,9,9,9,9]"},{name:"l2",value:"[9,9,9,9]"}], stdin:"7\n9 9 9 9 9 9 9\n4\n9 9 9 9", expectedOutput:"8 9 9 9 0 0 0 1" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n1; cin >> n1;
-    vector<int> a(n1);
-    for (int& x : a) cin >> x;
+    vector<int> a(n1); for (int& x : a) cin >> x;
     int n2; cin >> n2;
-    vector<int> b(n2);
-    for (int& x : b) cin >> x;
+    vector<int> b(n2); for (int& x : b) cin >> x;
     // Simulate addition with carry, print result digits separated by spaces
-    
     return 0;
 }` }
     },
     {
       id: 3, title: "Longest Palindromic Substring", topic: "Dynamic Programming", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given a string <code>s</code>, return the longest palindromic substring.</p>
-<p>If multiple answers of same length exist, return the first one found (leftmost).</p>`,
-      examples: [
-        { input: "babad", output: "bab", explanation: "\"aba\" is also valid." },
-        { input: "cbbd",  output: "bb" },
-      ],
-      constraints: ["1 ≤ s.length ≤ 1000", "s consists of digits and English letters."],
+      description: `<p>Given a string <code>s</code>, return the longest palindromic substring.</p>`,
+      examples: [{ input: "babad", output: "bab" }, { input: "cbbd", output: "bb" }],
+      constraints: ["1 ≤ s.length ≤ 1000"],
       testCases: [
         { label:"Case 1", vars:[{name:"s",value:"\"babad\""}], stdin:"babad", expectedOutput:"bab" },
-        { label:"Case 2", vars:[{name:"s",value:"\"cbbd\""}],  stdin:"cbbd",  expectedOutput:"bb" },
-        { label:"Case 3", vars:[{name:"s",value:"\"a\""}],     stdin:"a",     expectedOutput:"a" },
+        { label:"Case 2", vars:[{name:"s",value:"\"cbbd\""}], stdin:"cbbd", expectedOutput:"bb" },
+        { label:"Case 3", vars:[{name:"s",value:"\"a\""}], stdin:"a", expectedOutput:"a" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     string s; cin >> s;
     // Find and print the longest palindromic substring
-    
     return 0;
 }` }
     },
     {
       id: 4, title: "Container With Most Water", topic: "Two Pointers", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given integer array <code>height</code> of length <code>n</code>, there are <code>n</code> vertical lines. Find two lines that together with the x-axis form a container that holds the most water. Return the maximum water.</p>`,
-      examples: [
-        { input: "height = [1,8,6,2,5,4,8,3,7]", output: "49" },
-        { input: "height = [1,1]",                  output: "1" },
-      ],
-      constraints: ["n == height.length", "2 ≤ n ≤ 10⁵", "0 ≤ height[i] ≤ 10⁴"],
+      description: `<p>Given integer array <code>height</code> of length <code>n</code>, find two lines that together form a container that holds the most water. Return the maximum water.</p>`,
+      examples: [{ input: "height = [1,8,6,2,5,4,8,3,7]", output: "49" }],
+      constraints: ["2 ≤ n ≤ 10⁵"],
       testCases: [
         { label:"Case 1", vars:[{name:"height",value:"[1,8,6,2,5,4,8,3,7]"}], stdin:"9\n1 8 6 2 5 4 8 3 7", expectedOutput:"49" },
-        { label:"Case 2", vars:[{name:"height",value:"[1,1]"}],                 stdin:"2\n1 1",                expectedOutput:"1" },
-        { label:"Case 3", vars:[{name:"height",value:"[4,3,2,1,4]"}],           stdin:"5\n4 3 2 1 4",          expectedOutput:"16" },
+        { label:"Case 2", vars:[{name:"height",value:"[1,1]"}], stdin:"2\n1 1", expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"height",value:"[4,3,2,1,4]"}], stdin:"5\n4 3 2 1 4", expectedOutput:"16" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
-    vector<int> h(n);
-    for (int& x : h) cin >> x;
+    vector<int> h(n); for (int& x : h) cin >> x;
     // Two pointer approach — print max water
-    
     return 0;
 }` }
     },
     {
       id: 5, title: "3Sum", topic: "Two Pointers", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given an integer array <code>nums</code>, return all unique triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j != k</code> and <code>nums[i] + nums[j] + nums[k] == 0</code>.</p>
-<p>Print each triplet on a new line, values space-separated. Triplets in sorted order, one per line.</p>`,
-      examples: [
-        { input: "nums = [-1,0,1,2,-1,-4]", output: "-1 -1 2\n-1 0 1" },
-        { input: "nums = [0,1,1]",            output: "" },
-        { input: "nums = [0,0,0]",            output: "0 0 0" },
-      ],
-      constraints: ["3 ≤ nums.length ≤ 3000", "-10⁵ ≤ nums[i] ≤ 10⁵"],
+      description: `<p>Given an integer array <code>nums</code>, return all unique triplets that sum to zero. Print each triplet on a new line, values space-separated.</p>`,
+      examples: [{ input: "nums = [-1,0,1,2,-1,-4]", output: "-1 -1 2\n-1 0 1" }],
+      constraints: ["3 ≤ nums.length ≤ 3000"],
       testCases: [
         { label:"Case 1", vars:[{name:"nums",value:"[-1,0,1,2,-1,-4]"}], stdin:"6\n-1 0 1 2 -1 -4", expectedOutput:"-1 -1 2\n-1 0 1" },
-        { label:"Case 2", vars:[{name:"nums",value:"[0,1,1]"}],           stdin:"3\n0 1 1",           expectedOutput:"" },
-        { label:"Case 3", vars:[{name:"nums",value:"[0,0,0]"}],           stdin:"3\n0 0 0",           expectedOutput:"0 0 0" },
+        { label:"Case 2", vars:[{name:"nums",value:"[0,1,1]"}], stdin:"3\n0 1 1", expectedOutput:"" },
+        { label:"Case 3", vars:[{name:"nums",value:"[0,0,0]"}], stdin:"3\n0 0 0", expectedOutput:"0 0 0" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
-    vector<int> nums(n);
-    for (int& x : nums) cin >> x;
+    vector<int> nums(n); for (int& x : nums) cin >> x;
     sort(nums.begin(), nums.end());
     // Two-pointer 3Sum — print each triplet on a new line
-    
     return 0;
 }` }
     },
     {
       id: 6, title: "Binary Tree Level Order", topic: "Trees", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given the root of a binary tree, return its <strong>level order traversal</strong>.</p>
-<p>Input: level-order input where <code>-1</code> means null. Output: each level's values space-separated on its own line.</p>`,
-      examples: [
-        { input: "3 9 20 -1 -1 15 7", output: "3\n9 20\n15 7" },
-        { input: "1",                  output: "1" },
-      ],
-      constraints: ["0 ≤ Nodes ≤ 2000", "-1000 ≤ Node.val ≤ 1000"],
+      description: `<p>Given the root of a binary tree, return its <strong>level order traversal</strong>. Each level on its own line.</p>`,
+      examples: [{ input: "3 9 20 -1 -1 15 7", output: "3\n9 20\n15 7" }],
+      constraints: ["0 ≤ Nodes ≤ 2000"],
       testCases: [
         { label:"Case 1", vars:[{name:"root",value:"[3,9,20,null,null,15,7]"}], stdin:"7\n3 9 20 -1 -1 15 7", expectedOutput:"3\n9 20\n15 7" },
-        { label:"Case 2", vars:[{name:"root",value:"[1]"}],                      stdin:"1\n1",                  expectedOutput:"1" },
-        { label:"Case 3", vars:[{name:"root",value:"[1,2,3,4,5]"}],              stdin:"5\n1 2 3 4 5",          expectedOutput:"1\n2 3\n4 5" },
+        { label:"Case 2", vars:[{name:"root",value:"[1]"}], stdin:"1\n1", expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"root",value:"[1,2,3,4,5]"}], stdin:"5\n1 2 3 4 5", expectedOutput:"1\n2 3\n4 5" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
 struct TreeNode { int val; TreeNode *left, *right; TreeNode(int x): val(x), left(nullptr), right(nullptr){} };
-
 TreeNode* build(vector<int>& v, int i) {
     if (i >= (int)v.size() || v[i] == -1) return nullptr;
     TreeNode* node = new TreeNode(v[i]);
@@ -1121,128 +1242,96 @@ TreeNode* build(vector<int>& v, int i) {
     node->right = build(v, 2*i+2);
     return node;
 }
-
 int main() {
     int n; cin >> n;
-    vector<int> v(n);
-    for (int& x : v) cin >> x;
+    vector<int> v(n); for (int& x : v) cin >> x;
     TreeNode* root = build(v, 0);
     // BFS level order — print each level on its own line
-    
     return 0;
 }` }
     },
     {
       id: 7, title: "Number of Islands", topic: "Graphs", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given an <code>m×n</code> grid of <code>'1'</code>s (land) and <code>'0'</code>s (water), count the number of islands.</p>
-<p>Input: m and n, then m rows of n characters. Output: island count.</p>`,
-      examples: [
-        { input: "4 5\n11110\n11010\n11000\n00000", output: "1" },
-        { input: "4 5\n11000\n11000\n00100\n00011", output: "3" },
-      ],
+      description: `<p>Given an <code>m×n</code> grid of <code>'1'</code>s (land) and <code>'0'</code>s (water), count the number of islands.</p>`,
+      examples: [{ input: "4 5\n11110\n11010\n11000\n00000", output: "1" }],
       constraints: ["1 ≤ m, n ≤ 300"],
       testCases: [
         { label:"Case 1", vars:[{name:"grid",value:"4x5"}], stdin:"4 5\n11110\n11010\n11000\n00000", expectedOutput:"1" },
         { label:"Case 2", vars:[{name:"grid",value:"4x5"}], stdin:"4 5\n11000\n11000\n00100\n00011", expectedOutput:"3" },
-        { label:"Case 3", vars:[{name:"grid",value:"2x2"}], stdin:"2 2\n11\n11",                     expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"grid",value:"2x2"}], stdin:"2 2\n11\n11", expectedOutput:"1" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 void dfs(vector<string>& g, int r, int c) {
     if (r<0||r>=(int)g.size()||c<0||c>=(int)g[0].size()||g[r][c]!='1') return;
     g[r][c]='0';
     dfs(g,r+1,c); dfs(g,r-1,c); dfs(g,r,c+1); dfs(g,r,c-1);
 }
-
 int main() {
     int m, n; cin >> m >> n;
-    vector<string> grid(m);
-    for (string& row : grid) cin >> row;
+    vector<string> grid(m); for (string& row : grid) cin >> row;
     int islands = 0;
     // Count islands with DFS/BFS — print count
-    
     return 0;
 }` }
     },
     {
       id: 8, title: "Coin Change", topic: "Dynamic Programming", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given an array of coin denominations and a target <code>amount</code>, return the fewest number of coins needed to make the amount. If impossible, return <code>-1</code>.</p>`,
-      examples: [
-        { input: "coins = [1,5,11], amount = 15", output: "3", explanation: "5+5+5 = 15." },
-        { input: "coins = [2], amount = 3",        output: "-1" },
-        { input: "coins = [1], amount = 0",         output: "0" },
-      ],
-      constraints: ["1 ≤ coins.length ≤ 12", "1 ≤ coins[i] ≤ 2³¹-1", "0 ≤ amount ≤ 10⁴"],
+      description: `<p>Given an array of coin denominations and a target <code>amount</code>, return the fewest number of coins needed. If impossible, return <code>-1</code>.</p>`,
+      examples: [{ input: "coins = [1,5,11], amount = 15", output: "3" }],
+      constraints: ["1 ≤ coins.length ≤ 12"],
       testCases: [
         { label:"Case 1", vars:[{name:"coins",value:"[1,5,11]"},{name:"amount",value:"15"}], stdin:"3\n1 5 11\n15", expectedOutput:"3" },
-        { label:"Case 2", vars:[{name:"coins",value:"[2]"},{name:"amount",value:"3"}],        stdin:"1\n2\n3",       expectedOutput:"-1" },
-        { label:"Case 3", vars:[{name:"coins",value:"[1]"},{name:"amount",value:"0"}],        stdin:"1\n1\n0",       expectedOutput:"0" },
+        { label:"Case 2", vars:[{name:"coins",value:"[2]"},{name:"amount",value:"3"}], stdin:"1\n2\n3", expectedOutput:"-1" },
+        { label:"Case 3", vars:[{name:"coins",value:"[1]"},{name:"amount",value:"0"}], stdin:"1\n1\n0", expectedOutput:"0" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int k; cin >> k;
-    vector<int> coins(k);
-    for (int& c : coins) cin >> c;
+    vector<int> coins(k); for (int& c : coins) cin >> c;
     int amount; cin >> amount;
     // DP coin change — print min coins or -1
-    
     return 0;
 }` }
     },
     {
       id: 9, title: "Word Break", topic: "Dynamic Programming", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given a string <code>s</code> and a dictionary of words, return <code>true</code> if <code>s</code> can be segmented into space-separated dictionary words.</p>
-<p>Input: string s, then n (word count), then n words. Output: <code>true</code> or <code>false</code>.</p>`,
-      examples: [
-        { input: "leetcode\n2\nleet code", output: "true" },
-        { input: "applepenapple\n2\napple pen", output: "true" },
-        { input: "catsandog\n3\ncats dog sand", output: "false" },
-      ],
-      constraints: ["1 ≤ s.length ≤ 300", "1 ≤ wordDict.length ≤ 1000"],
+      description: `<p>Given a string <code>s</code> and a dictionary of words, return <code>true</code> if <code>s</code> can be segmented into dictionary words.</p>`,
+      examples: [{ input: "leetcode\n2\nleet code", output: "true" }],
+      constraints: ["1 ≤ s.length ≤ 300"],
       testCases: [
-        { label:"Case 1", vars:[{name:"s",value:"\"leetcode\""},{name:"dict",value:"[\"leet\",\"code\"]"}],       stdin:"leetcode\n2\nleet\ncode",             expectedOutput:"true" },
-        { label:"Case 2", vars:[{name:"s",value:"\"applepenapple\""},{name:"dict",value:"[\"apple\",\"pen\"]"}],  stdin:"applepenapple\n2\napple\npen",         expectedOutput:"true" },
-        { label:"Case 3", vars:[{name:"s",value:"\"catsandog\""},{name:"dict",value:"[\"cats\",\"dog\",\"sand\"]"}], stdin:"catsandog\n3\ncats\ndog\nsand",    expectedOutput:"false" },
+        { label:"Case 1", vars:[{name:"s",value:"\"leetcode\""},{name:"dict",value:"[\"leet\",\"code\"]"}], stdin:"leetcode\n2\nleet\ncode", expectedOutput:"true" },
+        { label:"Case 2", vars:[{name:"s",value:"\"applepenapple\""},{name:"dict",value:"[\"apple\",\"pen\"]"}], stdin:"applepenapple\n2\napple\npen", expectedOutput:"true" },
+        { label:"Case 3", vars:[{name:"s",value:"\"catsandog\""},{name:"dict",value:"[\"cats\",\"dog\",\"sand\"]"}], stdin:"catsandog\n3\ncats\ndog\nsand", expectedOutput:"false" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     string s; cin >> s;
     int n; cin >> n;
     unordered_set<string> dict;
     for (int i=0;i<n;i++) { string w; cin>>w; dict.insert(w); }
     // DP word break — print true/false
-    
     return 0;
 }` }
     },
     {
       id: 10, title: "Product of Array Except Self", topic: "Arrays", difficulty: "Medium", diffClass: "medium",
-      description: `<p>Given integer array <code>nums</code>, return array <code>answer</code> such that <code>answer[i]</code> is the product of all elements except <code>nums[i]</code>.</p>
-<p>Solve in <strong>O(n)</strong> without division. Print the answer array space-separated.</p>`,
-      examples: [
-        { input: "nums = [1,2,3,4]",        output: "24 12 8 6" },
-        { input: "nums = [-1,1,0,-3,3]",    output: "0 0 9 0 0" },
-      ],
-      constraints: ["2 ≤ nums.length ≤ 10⁵", "-30 ≤ nums[i] ≤ 30", "Product fits in 32-bit integer."],
+      description: `<p>Given integer array <code>nums</code>, return array <code>answer</code> such that <code>answer[i]</code> is the product of all elements except <code>nums[i]</code>. Solve in <strong>O(n)</strong> without division.</p>`,
+      examples: [{ input: "nums = [1,2,3,4]", output: "24 12 8 6" }],
+      constraints: ["2 ≤ nums.length ≤ 10⁵"],
       testCases: [
-        { label:"Case 1", vars:[{name:"nums",value:"[1,2,3,4]"}],      stdin:"4\n1 2 3 4",      expectedOutput:"24 12 8 6" },
-        { label:"Case 2", vars:[{name:"nums",value:"[-1,1,0,-3,3]"}],  stdin:"5\n-1 1 0 -3 3",  expectedOutput:"0 0 9 0 0" },
-        { label:"Case 3", vars:[{name:"nums",value:"[2,3,4,5]"}],      stdin:"4\n2 3 4 5",      expectedOutput:"60 40 30 24" },
+        { label:"Case 1", vars:[{name:"nums",value:"[1,2,3,4]"}], stdin:"4\n1 2 3 4", expectedOutput:"24 12 8 6" },
+        { label:"Case 2", vars:[{name:"nums",value:"[-1,1,0,-3,3]"}], stdin:"5\n-1 1 0 -3 3", expectedOutput:"0 0 9 0 0" },
+        { label:"Case 3", vars:[{name:"nums",value:"[2,3,4,5]"}], stdin:"4\n2 3 4 5", expectedOutput:"60 40 30 24" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
-    vector<int> nums(n);
-    for (int& x : nums) cin >> x;
+    vector<int> nums(n); for (int& x : nums) cin >> x;
     // Prefix/suffix product — print answer space-separated
-    
     return 0;
 }` }
     },
@@ -1251,151 +1340,111 @@ int main() {
   master: [
     {
       id: 1, title: "Median of Two Sorted Arrays", topic: "Binary Search", difficulty: "Hard", diffClass: "hard",
-      description: `<p>Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code>, return the <strong>median</strong> of the two sorted arrays.</p>
-<p>The overall run time complexity must be <strong>O(log(m+n))</strong>.</p>
-<p>Print the median with exactly 5 decimal places if it's a half-integer (e.g. 2.50000), or as an integer with .00000 otherwise.</p>`,
-      examples: [
-        { input: "nums1=[1,3] nums2=[2]",   output: "2.00000", explanation: "Merged: [1,2,3] → median 2." },
-        { input: "nums1=[1,2] nums2=[3,4]", output: "2.50000", explanation: "Merged: [1,2,3,4] → median 2.5." },
-      ],
-      constraints: ["0 ≤ m, n ≤ 1000", "1 ≤ m+n ≤ 2000", "-10⁶ ≤ nums[i] ≤ 10⁶"],
+      description: `<p>Given two sorted arrays <code>nums1</code> and <code>nums2</code>, return the <strong>median</strong> of the two sorted arrays in <strong>O(log(m+n))</strong>.</p>`,
+      examples: [{ input: "nums1=[1,3] nums2=[2]", output: "2.00000" }, { input: "nums1=[1,2] nums2=[3,4]", output: "2.50000" }],
+      constraints: ["0 ≤ m, n ≤ 1000"],
       testCases: [
-        { label:"Case 1", vars:[{name:"nums1",value:"[1,3]"},{name:"nums2",value:"[2]"}],   stdin:"2\n1 3\n1\n2",     expectedOutput:"2.00000" },
-        { label:"Case 2", vars:[{name:"nums1",value:"[1,2]"},{name:"nums2",value:"[3,4]"}], stdin:"2\n1 2\n2\n3 4",   expectedOutput:"2.50000" },
-        { label:"Case 3", vars:[{name:"nums1",value:"[0,0]"},{name:"nums2",value:"[0,0]"}], stdin:"2\n0 0\n2\n0 0",   expectedOutput:"0.00000" },
+        { label:"Case 1", vars:[{name:"nums1",value:"[1,3]"},{name:"nums2",value:"[2]"}], stdin:"2\n1 3\n1\n2", expectedOutput:"2.00000" },
+        { label:"Case 2", vars:[{name:"nums1",value:"[1,2]"},{name:"nums2",value:"[3,4]"}], stdin:"2\n1 2\n2\n3 4", expectedOutput:"2.50000" },
+        { label:"Case 3", vars:[{name:"nums1",value:"[0,0]"},{name:"nums2",value:"[0,0]"}], stdin:"2\n0 0\n2\n0 0", expectedOutput:"0.00000" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int m; cin >> m;
     vector<int> a(m); for (int& x : a) cin >> x;
     int n; cin >> n;
     vector<int> b(n); for (int& x : b) cin >> x;
-    // Binary search median — print with 5 decimal places
     cout << fixed << setprecision(5);
-    
+    // Binary search median — print with 5 decimal places
     return 0;
 }` }
     },
     {
       id: 2, title: "Serialize and Deserialize Binary Tree", topic: "Trees", difficulty: "Hard", diffClass: "hard",
-      description: `<p>Design an algorithm to serialize and deserialize a binary tree.</p>
-<p>Input: level-order tree values (-1 = null). Serialize to string, deserialize back, then print level-order traversal (each level space-separated on its own line).</p>`,
-      examples: [
-        { input: "1 2 3 -1 -1 4 5", output: "1\n2 3\n4 5" },
-        { input: "-1",              output: "" },
-      ],
-      constraints: ["0 ≤ Nodes ≤ 10⁴", "-1000 ≤ Node.val ≤ 1000"],
+      description: `<p>Design an algorithm to serialize and deserialize a binary tree. Serialize to string, deserialize back, then print level-order traversal.</p>`,
+      examples: [{ input: "1 2 3 -1 -1 4 5", output: "1\n2 3\n4 5" }],
+      constraints: ["0 ≤ Nodes ≤ 10⁴"],
       testCases: [
         { label:"Case 1", vars:[{name:"root",value:"[1,2,3,null,null,4,5]"}], stdin:"7\n1 2 3 -1 -1 4 5", expectedOutput:"1\n2 3\n4 5" },
-        { label:"Case 2", vars:[{name:"root",value:"[]"}],                     stdin:"1\n-1",              expectedOutput:"" },
-        { label:"Case 3", vars:[{name:"root",value:"[1,2]"}],                  stdin:"3\n1 2 -1",          expectedOutput:"1\n2" },
+        { label:"Case 2", vars:[{name:"root",value:"[]"}], stdin:"1\n-1", expectedOutput:"" },
+        { label:"Case 3", vars:[{name:"root",value:"[1,2]"}], stdin:"3\n1 2 -1", expectedOutput:"1\n2" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
 struct TreeNode { int val; TreeNode *left, *right; TreeNode(int x):val(x),left(nullptr),right(nullptr){} };
-
-string serialize(TreeNode* root) {
-    // Your code here
-    return "";
-}
-
-TreeNode* deserialize(string data) {
-    // Your code here
-    return nullptr;
-}
-
+string serialize(TreeNode* root) { return ""; }
+TreeNode* deserialize(string data) { return nullptr; }
 int main() {
     int n; cin >> n;
     vector<int> v(n); for (int& x : v) cin >> x;
     // Build tree, serialize, deserialize, print level order
-    
     return 0;
 }` }
     },
     {
       id: 3, title: "Trapping Rain Water", topic: "Two Pointers", difficulty: "Hard", diffClass: "hard",
-      description: `<p>Given <code>n</code> non-negative integers representing an elevation map where each bar has width 1, compute how much water can be trapped after raining.</p>`,
-      examples: [
-        { input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" },
-        { input: "height = [4,2,0,3,2,5]",              output: "9" },
-      ],
-      constraints: ["n == height.length", "1 ≤ n ≤ 2×10⁴", "0 ≤ height[i] ≤ 10⁵"],
+      description: `<p>Given <code>n</code> non-negative integers representing an elevation map, compute how much water can be trapped after raining.</p>`,
+      examples: [{ input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" }, { input: "height = [4,2,0,3,2,5]", output: "9" }],
+      constraints: ["1 ≤ n ≤ 2×10⁴"],
       testCases: [
         { label:"Case 1", vars:[{name:"height",value:"[0,1,0,2,1,0,1,3,2,1,2,1]"}], stdin:"12\n0 1 0 2 1 0 1 3 2 1 2 1", expectedOutput:"6" },
-        { label:"Case 2", vars:[{name:"height",value:"[4,2,0,3,2,5]"}],               stdin:"6\n4 2 0 3 2 5",               expectedOutput:"9" },
-        { label:"Case 3", vars:[{name:"height",value:"[3,0,2,0,4]"}],                 stdin:"5\n3 0 2 0 4",                 expectedOutput:"7" },
+        { label:"Case 2", vars:[{name:"height",value:"[4,2,0,3,2,5]"}], stdin:"6\n4 2 0 3 2 5", expectedOutput:"9" },
+        { label:"Case 3", vars:[{name:"height",value:"[3,0,2,0,4]"}], stdin:"5\n3 0 2 0 4", expectedOutput:"7" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
-    vector<int> h(n);
-    for (int& x : h) cin >> x;
+    vector<int> h(n); for (int& x : h) cin >> x;
     // Two-pointer or prefix max approach — print total water
-    
     return 0;
 }` }
     },
     {
       id: 4, title: "Regular Expression Matching", topic: "Dynamic Programming", difficulty: "Hard", diffClass: "hard",
-      description: `<p>Given an input string <code>s</code> and a pattern <code>p</code>, implement regular expression matching with <code>'.'</code> (any character) and <code>'*'</code> (zero or more of preceding).</p>
-<p>Print <code>true</code> if the entire string matches, <code>false</code> otherwise.</p>`,
-      examples: [
-        { input: "s=\"aa\" p=\"a\"",    output: "false" },
-        { input: "s=\"aa\" p=\"a*\"",   output: "true" },
-        { input: "s=\"ab\" p=\".*\"",   output: "true" },
-      ],
-      constraints: ["1 ≤ s.length ≤ 20", "1 ≤ p.length ≤ 30"],
+      description: `<p>Implement regex matching with <code>'.'</code> (any character) and <code>'*'</code> (zero or more of preceding). Print <code>true</code> or <code>false</code>.</p>`,
+      examples: [{ input: "s=\"aa\" p=\"a\"", output: "false" }, { input: "s=\"aa\" p=\"a*\"", output: "true" }],
+      constraints: ["1 ≤ s.length ≤ 20"],
       testCases: [
-        { label:"Case 1", vars:[{name:"s",value:"\"aa\""},{name:"p",value:"\"a\""}],   stdin:"aa\na",   expectedOutput:"false" },
-        { label:"Case 2", vars:[{name:"s",value:"\"aa\""},{name:"p",value:"\"a*\""}],  stdin:"aa\na*",  expectedOutput:"true" },
-        { label:"Case 3", vars:[{name:"s",value:"\"ab\""},{name:"p",value:"\".*\""}],  stdin:"ab\n.*",  expectedOutput:"true" },
+        { label:"Case 1", vars:[{name:"s",value:"\"aa\""},{name:"p",value:"\"a\""}], stdin:"aa\na", expectedOutput:"false" },
+        { label:"Case 2", vars:[{name:"s",value:"\"aa\""},{name:"p",value:"\"a*\""}], stdin:"aa\na*", expectedOutput:"true" },
+        { label:"Case 3", vars:[{name:"s",value:"\"ab\""},{name:"p",value:"\".*\""}], stdin:"ab\n.*", expectedOutput:"true" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
-    string s, p;
-    cin >> s >> p;
+    string s, p; cin >> s >> p;
     // DP regex matching — print true/false
-    
     return 0;
 }` }
     },
     {
       id: 5, title: "Sliding Window Maximum", topic: "Sliding Window", difficulty: "Hard", diffClass: "hard",
-      description: `<p>Given an array <code>nums</code> of integers and a window size <code>k</code>, return the maximum value in each window as it slides from left to right.</p>
-<p>Print the maximums space-separated.</p>`,
-      examples: [
-        { input: "nums=[1,3,-1,-3,5,3,6,7] k=3", output: "3 3 5 5 6 7" },
-        { input: "nums=[1] k=1",                   output: "1" },
-      ],
-      constraints: ["1 ≤ nums.length ≤ 10⁵", "-10⁴ ≤ nums[i] ≤ 10⁴", "1 ≤ k ≤ nums.length"],
+      description: `<p>Given an array <code>nums</code> and window size <code>k</code>, return the maximum value in each sliding window. Print the maximums space-separated.</p>`,
+      examples: [{ input: "nums=[1,3,-1,-3,5,3,6,7] k=3", output: "3 3 5 5 6 7" }],
+      constraints: ["1 ≤ nums.length ≤ 10⁵"],
       testCases: [
         { label:"Case 1", vars:[{name:"nums",value:"[1,3,-1,-3,5,3,6,7]"},{name:"k",value:"3"}], stdin:"8\n1 3 -1 -3 5 3 6 7\n3", expectedOutput:"3 3 5 5 6 7" },
-        { label:"Case 2", vars:[{name:"nums",value:"[1]"},{name:"k",value:"1"}],                  stdin:"1\n1\n1",                  expectedOutput:"1" },
-        { label:"Case 3", vars:[{name:"nums",value:"[9,11]"},{name:"k",value:"2"}],               stdin:"2\n9 11\n2",               expectedOutput:"11" },
+        { label:"Case 2", vars:[{name:"nums",value:"[1]"},{name:"k",value:"1"}], stdin:"1\n1\n1", expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"nums",value:"[9,11]"},{name:"k",value:"2"}], stdin:"2\n9 11\n2", expectedOutput:"11" },
       ],
       starterCode: { cpp: `#include <bits/stdc++.h>
 using namespace std;
-
 int main() {
     int n; cin >> n;
-    vector<int> nums(n);
-    for (int& x : nums) cin >> x;
+    vector<int> nums(n); for (int& x : nums) cin >> x;
     int k; cin >> k;
     // Monotonic deque — print window maxima space-separated
-    
     return 0;
 }` }
     },
   ],
 };
 
-/* Completion tracking */
+/* ════════════════════════════════════════════════════════
+   COMPLETION + MASTERY
+════════════════════════════════════════════════════════ */
 const completed = JSON.parse(localStorage.getItem('unravel_completed') || '{}');
 function markCompleted(tierKey, id) {
   if (!completed[tierKey]) completed[tierKey] = {};
@@ -1403,25 +1452,17 @@ function markCompleted(tierKey, id) {
   localStorage.setItem('unravel_completed', JSON.stringify(completed));
   updateMastery();
 }
-function isCompleted(tierKey, id) {
-  return !!(completed[tierKey] && completed[tierKey][id]);
-}
+function isCompleted(tierKey, id) { return !!(completed[tierKey] && completed[tierKey][id]); }
 function updateMastery() {
   const total = 15 + 10 + 5;
   let done = 0;
-  for (const tk of ['newBorn','youngBlood','master']) {
-    done += Object.keys(completed[tk] || {}).length;
-  }
+  for (const tk of ['newBorn','youngBlood','master']) done += Object.keys(completed[tk] || {}).length;
   const pct = Math.round(done / total * 100);
   document.getElementById('global-mastery-pct').textContent = pct + '%';
   document.getElementById('global-mastery-bar').style.width = pct + '%';
-  // per-tier
-  const nbDone = Object.keys(completed.newBorn || {}).length;
-  const ybDone = Object.keys(completed.youngBlood || {}).length;
-  const mDone  = Object.keys(completed.master || {}).length;
-  document.getElementById('nb-progress').textContent = `${nbDone}/15 Completed`;
-  document.getElementById('yb-progress').textContent = `${ybDone}/10 Completed`;
-  document.getElementById('m-progress').textContent  = `${mDone}/5 Completed`;
+  document.getElementById('nb-progress').textContent = `${Object.keys(completed.newBorn||{}).length}/15 Completed`;
+  document.getElementById('yb-progress').textContent = `${Object.keys(completed.youngBlood||{}).length}/10 Completed`;
+  document.getElementById('m-progress').textContent  = `${Object.keys(completed.master||{}).length}/5 Completed`;
 }
 updateMastery();
 
@@ -1440,14 +1481,13 @@ function showQuestions(tierKey) {
   document.getElementById('qv-desc').textContent  = meta.desc;
   const list = document.getElementById('qv-list');
   list.innerHTML = '';
-
   QUESTIONS[tierKey].forEach(q => {
     const done = isCompleted(tierKey, q.id);
     const el = document.createElement('div');
     el.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:8px;background:#1c1b1b;border:1px solid rgba(63,72,80,0.22);cursor:pointer;transition:all 0.18s;';
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;">
-        <span class="material-symbols-outlined" style="color:${done?'#92ccff':'#3f4850'};font-size:20px!important">${done?'check_circle':'radio_button_unchecked'}</span>
+        <span class="material-symbols-outlined" style="color:${done?'#22ff88':'#3f4850'};font-size:20px!important;${done?'filter:drop-shadow(0 0 6px #22ff88)':''}">${done?'check_circle':'radio_button_unchecked'}</span>
         <div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:0.02em;margin-bottom:2px;">Q${q.id}: ${q.title}</div>
           <div style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;color:#9aa3ad;text-transform:uppercase;letter-spacing:0.07em;">${q.topic} · Level ${meta.level}</div>
@@ -1464,10 +1504,9 @@ function showQuestions(tierKey) {
       </div>`;
     el.addEventListener('mouseover', () => { el.style.borderColor='rgba(146,204,255,0.25)'; el.style.background='#201f1f'; });
     el.addEventListener('mouseout',  () => { el.style.borderColor='rgba(63,72,80,0.22)';   el.style.background='#1c1b1b'; });
-    el.addEventListener('click',     () => openWorkspace(q, tierKey));
+    el.addEventListener('click', () => openWorkspace(q, tierKey));
     list.appendChild(el);
   });
-
   document.getElementById('tier-selection').classList.add('hidden');
   document.getElementById('questions-view').classList.remove('hidden');
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1486,6 +1525,10 @@ let leftTabs, bottomTabs;
 let currentQuestion = null;
 let currentTierKey  = null;
 let currentCaseIdx  = 0;
+let lastRunSuccess  = false;
+
+/* Per-question submission history stored in memory */
+let submissionHistory = {};
 
 document.addEventListener('DOMContentLoaded', () => {
   editor = ace.edit('code-editor');
@@ -1507,6 +1550,14 @@ function openWorkspace(q, tierKey) {
   currentQuestion = q;
   currentTierKey  = tierKey;
   currentCaseIdx  = 0;
+  lastRunSuccess  = false;
+
+  // Reset complexity panel
+  document.getElementById('complexity-placeholder').style.display = 'flex';
+  document.getElementById('complexity-results').style.display = 'none';
+  document.getElementById('comp-time-value').textContent  = '—';
+  document.getElementById('comp-space-value').textContent = '—';
+  document.getElementById('comp-explanation').textContent = '—';
 
   // Build description HTML
   let descHTML = `<h1>${q.id}. ${q.title}</h1>
@@ -1515,7 +1566,6 @@ function openWorkspace(q, tierKey) {
     <span class="badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">sell</span> ${q.topic}</span>
   </div>
   ${q.description}`;
-
   q.examples.forEach((ex, i) => {
     descHTML += `<div class="section-title">Example ${i+1}</div>
     <div class="code-block">
@@ -1524,23 +1574,18 @@ function openWorkspace(q, tierKey) {
       ${ex.explanation ? `<br><span class="label">Explanation:</span> ${esc(ex.explanation)}` : ''}
     </div>`;
   });
-
   if (q.constraints.length) {
     descHTML += `<div class="section-title">Constraints</div>
     <ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;font-family:var(--font-body);">
       ${q.constraints.map(c => `<li><code>${c}</code></li>`).join('')}
     </ul>`;
   }
-
   document.getElementById('ws-desc-body').innerHTML = descHTML;
 
-  // Set starter code
   editor.setValue(q.starterCode.cpp, -1);
-
-  // Build test case tabs
   buildCaseTabs(q);
+  renderHistoryPanel();
 
-  // Show workspace
   document.getElementById('main-app-container').style.display = 'none';
   const app = document.getElementById('app');
   app.style.display = 'flex';
@@ -1587,8 +1632,7 @@ function buildCaseTabs(q) {
 }
 
 function renderCaseDisplay(tc) {
-  const el = document.getElementById('case-display');
-  el.innerHTML = tc.vars.map(v =>
+  document.getElementById('case-display').innerHTML = tc.vars.map(v =>
     `<div class="var-label">${v.name} =</div><div class="var-value">${v.value}</div>`
   ).join('');
 }
@@ -1597,7 +1641,7 @@ function closeWorkspace() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('main-app-container').style.display = 'block';
   document.body.classList.remove('workspace-active');
-  showQuestions(currentTierKey); // go back to the question list
+  showQuestions(currentTierKey);
 }
 
 function resetCode() {
@@ -1605,83 +1649,193 @@ function resetCode() {
 }
 
 /* ════════════════════════════════════════════════════════
-   RUN CODE — calls /api/run, compares against test cases
+   HISTORY PANEL
+════════════════════════════════════════════════════════ */
+function addToHistory(entry) {
+  const key = `${currentTierKey}_${currentQuestion.id}`;
+  if (!submissionHistory[key]) submissionHistory[key] = [];
+  submissionHistory[key].unshift(entry);
+  renderHistoryPanel();
+}
+
+function renderHistoryPanel() {
+  const key = `${currentTierKey}_${currentQuestion.id}`;
+  const entries = submissionHistory[key] || [];
+  const listEl = document.getElementById('ws-history-list');
+  const badge  = document.getElementById('ws-history-count');
+
+  badge.textContent = entries.length;
+  badge.style.display = entries.length > 0 ? 'inline-flex' : 'none';
+
+  if (entries.length === 0) {
+    listEl.innerHTML = `<div class="history-empty">
+      <span class="material-symbols-outlined mat-icon-large">history_toggle_off</span>
+      <p>No submissions yet.<br/>Hit <strong style="color:#ffcb30">Submit</strong> to see your history here.</p>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = entries.map((e, i) => {
+    const statusChip = e.allPass
+      ? `<span class="history-chip chip-pass">Accepted</span>`
+      : `<span class="history-chip chip-fail">Wrong Answer</span>`;
+    const scoreChip = `<span class="history-chip chip-score">${e.passed}/${e.total} passed</span>`;
+    return `<div class="history-item" onclick="restoreSubmission(${i})">
+      <div class="history-item-top">
+        <div class="history-item-title">${e.allPass ? '✓' : '✗'} Submission #${entries.length - i}</div>
+        <div class="history-item-time">${e.time}</div>
+      </div>
+      <div class="history-item-chips">${statusChip}${scoreChip}</div>
+    </div>`;
+  }).join('');
+}
+
+function restoreSubmission(idx) {
+  const key = `${currentTierKey}_${currentQuestion.id}`;
+  const entry = submissionHistory[key][idx];
+  if (!entry) return;
+  bottomTabs.activate('test-result');
+  renderResults(entry.results, document.getElementById('test-result-output'), true);
+}
+
+/* ════════════════════════════════════════════════════════
+   RUN CODE
 ════════════════════════════════════════════════════════ */
 async function runCode() {
   const code = editor.getValue();
   const q    = currentQuestion;
-
   bottomTabs.activate('test-result');
   const outEl = document.getElementById('test-result-output');
   outEl.innerHTML = '<span style="color:#9aa3ad;opacity:0.6;font-family:var(--font-body);">Running test cases…</span>';
-
   document.getElementById('run-btn').disabled = true;
+  lastRunSuccess = false;
 
   try {
-    // Run against each test case
     const results = await Promise.all(q.testCases.map(async tc => {
       try {
-        const res  = await fetch('/api/run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, input: tc.stdin }),
-        });
+        const res  = await fetch('/api/run', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, input: tc.stdin }) });
         const data = await res.json();
         if (!data.success) return { tc, status: 'err', actual: data.output };
         const actual   = (data.output || '').trim();
         const expected = tc.expectedOutput.trim();
         return { tc, status: actual === expected ? 'pass' : 'fail', actual, expected };
-      } catch (e) {
-        return { tc, status: 'err', actual: e.message };
-      }
+      } catch (e) { return { tc, status: 'err', actual: e.message }; }
     }));
-
-    renderResults(results, outEl);
+    const allPass = results.every(r => r.status === 'pass');
+    lastRunSuccess = !results.some(r => r.status === 'err');
+    renderResults(results, outEl, false);
   } finally {
     document.getElementById('run-btn').disabled = false;
   }
 }
 
 async function submitCode() {
-  // Submit runs all cases and marks complete if all pass
   const code = editor.getValue();
   const q    = currentQuestion;
-
   bottomTabs.activate('test-result');
   const outEl = document.getElementById('test-result-output');
   outEl.innerHTML = '<span style="color:#9aa3ad;opacity:0.6;font-family:var(--font-body);">Judging submission…</span>';
-
   document.getElementById('submit-btn').disabled = true;
 
   try {
     const results = await Promise.all(q.testCases.map(async tc => {
       try {
-        const res  = await fetch('/api/run', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, input: tc.stdin }),
-        });
+        const res  = await fetch('/api/run', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code, input: tc.stdin }) });
         const data = await res.json();
         if (!data.success) return { tc, status: 'err', actual: data.output };
         const actual   = (data.output || '').trim();
         const expected = tc.expectedOutput.trim();
         return { tc, status: actual === expected ? 'pass' : 'fail', actual, expected };
-      } catch (e) {
-        return { tc, status: 'err', actual: e.message };
-      }
+      } catch (e) { return { tc, status: 'err', actual: e.message }; }
     }));
 
-    const allPass = results.every(r => r.status === 'pass');
-    if (allPass) {
-      markCompleted(currentTierKey, q.id);
-      // Refresh question list later
-    }
+    const allPass  = results.every(r => r.status === 'pass');
+    const passed   = results.filter(r => r.status === 'pass').length;
+    lastRunSuccess = !results.some(r => r.status === 'err');
+
+    if (allPass) markCompleted(currentTierKey, q.id);
+
+    // Save to history
+    const now = new Date();
+    addToHistory({
+      results, allPass, passed, total: results.length,
+      time: now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }),
+    });
+
     renderResults(results, outEl, true);
   } finally {
     document.getElementById('submit-btn').disabled = false;
   }
 }
 
+/* ════════════════════════════════════════════════════════
+   COMPLEXITY ANALYSIS (AI-powered via Anthropic API)
+════════════════════════════════════════════════════════ */
+async function analyzeCode() {
+  if (!lastRunSuccess) {
+    bottomTabs.activate('test-result');
+    document.getElementById('test-result-output').innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 0;font-family:var(--font-body);font-size:13px;color:#ffcb30;">
+        <span class="material-symbols-outlined" style="font-size:16px!important;color:#ffcb30">warning</span>
+        Run your code successfully first before analyzing complexity.
+      </div>`;
+    return;
+  }
+
+  const code = editor.getValue();
+  leftTabs.activate('complexity');
+
+  document.getElementById('complexity-placeholder').style.display = 'none';
+  document.getElementById('complexity-results').style.display = 'block';
+  document.getElementById('complexity-analyzing').style.display = 'flex';
+  document.getElementById('comp-time-value').textContent  = '…';
+  document.getElementById('comp-space-value').textContent = '…';
+  document.getElementById('comp-explanation').textContent = 'Analyzing…';
+  document.getElementById('analyze-btn').disabled = true;
+
+  try {
+    const res  = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const data = await res.json();
+
+    // Parse the plain-text result string from server.js
+    const resultText = data.result || '';
+    const timeVal  = data.timeComplexity  || extractBigO(resultText, 'time')  || 'N/A';
+    const spaceVal = data.spaceComplexity || extractBigO(resultText, 'space') || 'N/A';
+    const expText  = data.explanation     || extractExplanation(resultText)   || resultText || '—';
+
+    document.getElementById('comp-time-value').textContent  = timeVal;
+    document.getElementById('comp-space-value').textContent = spaceVal;
+    document.getElementById('comp-explanation').textContent = expText;
+
+  } catch (e) {
+    document.getElementById('comp-explanation').textContent = 'Error: ' + e.message;
+    document.getElementById('comp-time-value').textContent  = 'N/A';
+    document.getElementById('comp-space-value').textContent = 'N/A';
+  } finally {
+    document.getElementById('complexity-analyzing').style.display = 'none';
+    document.getElementById('analyze-btn').disabled = false;
+  }
+}
+
+function extractExplanation(text) {
+  if (!text) return null;
+  const m = text.match(/Explanation:\s*(.+)/i);
+  return m ? m[1].trim() : null;
+}
+
+function extractBigO(text, type) {
+  if (!text) return null;
+  const m = text.match(new RegExp(type + '[^:]*:\\s*(O\\([^)]+\\))', 'i'));
+  return m ? m[1] : null;
+}
+
+/* ════════════════════════════════════════════════════════
+   RENDER RESULTS (vivid)
+════════════════════════════════════════════════════════ */
 function renderResults(results, outEl, isSubmit = false) {
   const total   = results.length;
   const passed  = results.filter(r => r.status === 'pass').length;
@@ -1693,69 +1847,56 @@ function renderResults(results, outEl, isSubmit = false) {
   if (isSubmit) {
     if (allPass) {
       html += `<div class="result-summary all-pass">
-        <span class="material-symbols-outlined" style="font-size:18px!important">check_circle</span>
-        Accepted — ${passed}/${total} test cases passed!
+        <span class="material-symbols-outlined">check_circle</span>
+        Accepted — All test cases passed!
+        <span class="score-pill">${passed}/${total}</span>
       </div>`;
     } else if (hasErr) {
       html += `<div class="result-summary compile-err">
-        <span class="material-symbols-outlined" style="font-size:18px!important">error</span>
+        <span class="material-symbols-outlined">error</span>
         Compile / Runtime Error
+        <span class="score-pill">${passed}/${total}</span>
       </div>`;
     } else {
       html += `<div class="result-summary some-fail">
-        <span class="material-symbols-outlined" style="font-size:18px!important">cancel</span>
-        Wrong Answer — ${passed}/${total} test cases passed
+        <span class="material-symbols-outlined">cancel</span>
+        Wrong Answer
+        <span class="score-pill">${passed}/${total} passed</span>
       </div>`;
     }
   } else {
-    html += `<div style="font-family:var(--font-body);font-size:12px;color:var(--on-surface-var);margin-bottom:10px;padding:6px 0;">
+    const countColor = allPass ? 'var(--green)' : hasErr ? 'var(--yellow)' : 'var(--red)';
+    html += `<div style="font-family:var(--font-body);font-size:12.5px;font-weight:700;margin-bottom:12px;padding:6px 2px;color:${countColor};">
       ${passed}/${total} test case${total>1?'s':''} passed
     </div>`;
   }
 
   results.forEach((r, i) => {
-    const statusClass = r.status === 'pass' ? 'pass' : r.status === 'fail' ? 'fail' : 'err';
-    const icon  = r.status === 'pass' ? '✓' : r.status === 'fail' ? '✗' : '⚠';
-    const color = r.status === 'pass' ? 'var(--green)' : r.status === 'fail' ? 'var(--red)' : 'var(--yellow)';
+    const cls   = r.status === 'pass' ? 'pass' : r.status === 'fail' ? 'fail' : 'err';
+    const icon  = r.status === 'pass' ? 'check_circle' : r.status === 'fail' ? 'cancel' : 'error';
     const label = r.status === 'pass' ? 'Passed' : r.status === 'fail' ? 'Wrong Answer' : 'Error';
+    const actualClass = r.status === 'fail' ? 'actual-fail' : r.status === 'err' ? 'actual-err' : '';
 
     html += `<div class="tc-card">
-      <div class="tc-header ${statusClass}" onclick="this.nextElementSibling.classList.toggle('open')">
-        <span style="color:${color};font-weight:800;font-family:var(--font-mono)">${icon}</span>
-        <span style="color:${color}">${r.tc.label}</span>
-        <span style="color:var(--on-surface-var);font-weight:500;margin-left:4px">— ${label}</span>
-        <span style="margin-left:auto;color:var(--on-surface-var);font-size:10px">▼ details</span>
+      <div class="tc-header ${cls}" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span class="material-symbols-outlined tc-status-icon" style="font-size:16px!important">${icon}</span>
+        <span class="tc-label">${r.tc.label}</span>
+        <span class="tc-sublabel">— ${label}</span>
+        <span class="tc-toggle-arrow">▼ details</span>
       </div>
       <div class="tc-body ${i === 0 ? 'open' : ''}">
         <div class="tc-row-label">Input (stdin)</div>
         <div class="tc-row-val">${esc(r.tc.stdin)}</div>
         <div class="tc-row-label">Expected Output</div>
-        <div class="tc-row-val" style="color:var(--green)">${esc(r.tc.expectedOutput || '(empty)')}</div>
+        <div class="tc-row-val expected">${esc(r.tc.expectedOutput || '(empty)')}</div>
         ${r.status !== 'pass' ? `
         <div class="tc-row-label">Your Output</div>
-        <div class="tc-row-val" style="color:${color}">${esc(r.actual || '(no output)')}</div>` : ''}
+        <div class="tc-row-val ${actualClass}">${esc(r.actual || '(no output)')}</div>` : ''}
       </div>
     </div>`;
   });
 
   outEl.innerHTML = html;
-}
-
-async function runCustom() {
-  const code  = editor.getValue();
-  const input = document.getElementById('input-box')?.value || '';
-  bottomTabs.activate('test-result');
-  const outEl = document.getElementById('test-result-output');
-  outEl.innerHTML = '<span style="opacity:0.5;font-family:var(--font-body)">Running custom input…</span>';
-  try {
-    const res  = await fetch('/api/run', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({code, input}) });
-    const data = await res.json();
-    outEl.innerHTML = data.success
-      ? `<pre class="out-success">${esc(data.output || '(no output)')}</pre>`
-      : `<pre class="out-error">${esc(data.output)}</pre>`;
-  } catch (e) {
-    outEl.innerHTML = `<pre class="out-error">Network error: ${esc(e.message)}</pre>`;
-  }
 }
 
 function esc(s) {
