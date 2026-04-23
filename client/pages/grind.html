@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,600;1,700;1,800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="split-layout.css"/>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -55,28 +54,150 @@
   }
 </script>
 <style>
-  /* Landing-only styles */
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
   }
-  .glass-card {
-    background: rgba(53,53,52,0.6);
-    backdrop-filter: blur(20px);
-  }
+  .glass-card { background: rgba(53,53,52,0.6); backdrop-filter: blur(20px); }
   .text-gradient-primary {
     background: linear-gradient(135deg, #92CCFF 0%, #3498DB 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   }
-  /* Landing page scrolls normally; workspace is fixed fullscreen */
   #landing { min-height: max(884px, 100dvh); }
+
+  /* ── Workspace ── */
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg: #131313; --surface-low: #1c1b1b; --surface-high: #2a2a2a;
+    --surface-highest: #353534; --outline: #3f4850; --primary: #92ccff;
+    --primary-dim: #3498db; --on-primary: #003351; --tertiary: #c3c7c8;
+    --on-surface: #e5e2e1; --on-surface-var: #9aa3ad; --teal: #4ec9b0;
+    --green: #4ade80; --red: #f87171; --yellow: #fbbf24;
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+    --font-mono: 'JetBrains Mono', 'ui-monospace', monospace;
+    --nav-h: 48px; --r-panel: 7px;
+  }
+  html, body { margin:0; padding:0; width:100%; height:100%; overflow:auto; background:transparent; color:var(--on-surface); font-family:var(--font-body); }
+  body.workspace-active { overflow:hidden; background:var(--bg); }
+  ::-webkit-scrollbar { width:4px; height:4px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:#2a3038; border-radius:4px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--outline); }
+
+  #app { display:flex; flex-direction:column; width:100vw; height:100vh; overflow:hidden; }
+  .ws-nav { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; height:var(--nav-h); padding:0 16px; background:var(--surface-low); border-bottom:1px solid rgba(63,72,80,0.4); flex-shrink:0; z-index:10; }
+  .nav-left { display:flex; align-items:center; gap:10px; }
+  .nav-center { display:flex; align-items:center; gap:10px; justify-content:center; }
+  .nav-right { display:flex; align-items:center; gap:20px; justify-content:flex-end; }
+  .nav-logo { font-family:var(--font-display); font-weight:800; font-size:19px; letter-spacing:0.06em; text-transform:uppercase; color:var(--on-surface); text-decoration:none; line-height:1; flex-shrink:0; transition:opacity 0.2s; }
+  .nav-logo:hover { opacity:0.7; }
+  .nav-sep { width:1px; height:16px; background:rgba(63,72,80,0.55); flex-shrink:0; }
+  .nav-back { display:flex; align-items:center; gap:5px; padding:5px 9px; border-radius:5px; border:none; background:transparent; cursor:pointer; color:var(--on-surface-var); font-family:var(--font-body); font-size:12px; font-weight:600; transition:color 0.15s, background 0.15s; }
+  .nav-back:hover { color:var(--on-surface); background:rgba(63,72,80,0.22); }
+  .nav-btn { display:flex; align-items:center; gap:6px; padding:6px 16px; border-radius:5px; border:none; cursor:pointer; font-family:var(--font-body); font-size:13px; font-weight:700; transition:all 0.15s; }
+  .nav-btn.ghost { background:rgba(63,72,80,0.32); color:var(--primary); border:1px solid rgba(146,204,255,0.14); }
+  .nav-btn.ghost:hover { background:rgba(146,204,255,0.1); border-color:rgba(146,204,255,0.28); }
+  .nav-btn.primary { background:var(--primary); color:var(--on-primary); box-shadow:0 0 12px rgba(146,204,255,0.2); }
+  .nav-btn.primary:hover { filter:brightness(1.08); box-shadow:0 0 18px rgba(146,204,255,0.33); }
+  .nav-btn:disabled { opacity:0.5; cursor:not-allowed; }
+  .nav-links { display:flex; align-items:center; gap:40px; }
+  .nav-link { font-family:var(--font-display); font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:0.1em; text-decoration:none; color:rgba(229,226,225,0.38); transition:color 0.2s; white-space:nowrap; }
+  .nav-link:hover { color:rgba(229,226,225,0.7); }
+  .nav-link.active { color:var(--primary); }
+  .avatar { width:29px; height:29px; border-radius:50%; overflow:hidden; border:1.5px solid rgba(63,72,80,0.45); flex-shrink:0; }
+  .avatar img { width:100%; height:100%; object-fit:cover; }
+  .icon-btn { background:none; border:none; cursor:pointer; color:var(--on-surface-var); display:flex; align-items:center; padding:5px; border-radius:5px; transition:color 0.15s, background 0.15s; }
+  .icon-btn:hover { color:var(--on-surface); background:rgba(63,72,80,0.28); }
+
+  .split-container { display:flex; flex:1; overflow:hidden; padding:7px; }
+  .panel { display:flex; flex-direction:column; overflow:hidden; background:var(--surface-low); border-radius:var(--r-panel); border:1px solid rgba(63,72,80,0.28); }
+  .panel-left { flex:0 0 auto; }
+  .panel-right { flex:1 1 0; min-width:0; }
+  .divider-v { width:6px; flex-shrink:0; cursor:col-resize; position:relative; margin:7px 3px; z-index:5; }
+  .divider-v::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:2px; height:30px; background:rgba(63,72,80,0.55); border-radius:2px; transition:all 0.18s; }
+  .divider-v:hover::after, .divider-v.dragging::after { background:var(--primary); height:46px; width:3px; box-shadow:0 0 8px rgba(146,204,255,0.38); }
+  .panel-tabs { display:flex; align-items:center; padding:0 6px; background:rgba(22,21,21,0.75); border-bottom:1px solid rgba(63,72,80,0.22); flex-shrink:0; overflow-x:auto; gap:2px; }
+  .panel-tabs::-webkit-scrollbar { height:0; }
+  .tab-btn { display:flex; align-items:center; gap:5px; padding:9px 13px 8px; background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-family:var(--font-body); font-size:12px; font-weight:600; letter-spacing:0.02em; color:var(--on-surface-var); white-space:nowrap; transition:color 0.15s, border-color 0.15s; margin-bottom:-1px; }
+  .tab-btn:hover { color:var(--on-surface); }
+  .tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
+  .tab-btn.active.teal { color:var(--teal); border-bottom-color:var(--teal); }
+  .panel-body { flex:1; overflow-y:auto; overflow-x:hidden; }
+  .right-split { display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
+  .editor-section { flex:1 1 auto; display:flex; flex-direction:column; overflow:hidden; min-height:80px; }
+  .divider-h { height:6px; flex-shrink:0; cursor:row-resize; position:relative; margin:3px 0; z-index:5; }
+  .divider-h::after { content:''; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); height:2px; width:30px; background:rgba(63,72,80,0.55); border-radius:2px; transition:all 0.18s; }
+  .divider-h:hover::after, .divider-h.dragging::after { background:var(--primary); width:46px; height:3px; box-shadow:0 0 8px rgba(146,204,255,0.38); }
+  .bottom-section { display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; background:var(--surface-low); border-radius:var(--r-panel); border:1px solid rgba(63,72,80,0.28); }
+  .tab-panel { display:none; flex:1; overflow:auto; }
+  .tab-panel.active { display:flex; flex-direction:column; }
+  .editor-lang-bar { display:flex; align-items:center; justify-content:space-between; padding:5px 12px; border-bottom:1px solid rgba(63,72,80,0.16); flex-shrink:0; }
+  .lang-selector { display:flex; align-items:center; gap:6px; background:rgba(63,72,80,0.28); padding:4px 10px; border-radius:4px; border:none; cursor:pointer; color:var(--on-surface-var); font-family:var(--font-body); font-size:12px; font-weight:600; transition:all 0.15s; }
+  .lang-selector:hover { color:var(--on-surface); background:rgba(63,72,80,0.42); }
+  #ace-container { flex:1; position:relative; background:#1a1a1a; overflow:hidden; }
+  #code-editor { position:absolute; inset:0; font-size:14px; }
+  .output-area { flex:1; padding:12px 16px; font-family:var(--font-mono); font-size:12.5px; overflow:auto; color:var(--on-surface-var); line-height:1.6; }
+  .output-area .placeholder { font-style:italic; opacity:0.4; font-family:var(--font-body); }
+  .output-area pre { margin:0; white-space:pre-wrap; word-break:break-all; }
+  .out-success { color:var(--green); }
+  .out-error { color:var(--red); }
+  .stdin-area { flex:1; padding:10px 14px; background:transparent; color:var(--on-surface); font-family:var(--font-mono); font-size:13px; border:none; outline:none; resize:none; line-height:1.65; }
+  .stdin-area::placeholder { color:rgba(154,163,173,0.28); font-family:var(--font-body); }
+  .testcase-body { flex:1; padding:12px 16px; overflow:auto; }
+  .case-tabs { display:flex; gap:6px; margin-bottom:14px; }
+  .case-tab { padding:4px 14px; border-radius:5px; background:rgba(63,72,80,0.28); color:var(--on-surface); border:none; cursor:pointer; font-family:var(--font-body); font-size:12px; font-weight:600; transition:all 0.15s; }
+  .case-tab.active { background:rgba(146,204,255,0.13); color:var(--primary); }
+  .case-tab:hover { background:rgba(146,204,255,0.07); }
+  .var-label { font-family:var(--font-mono); font-size:11px; color:var(--on-surface-var); margin-bottom:5px; }
+  .var-value { background:rgba(63,72,80,0.18); border:1px solid rgba(63,72,80,0.18); border-radius:4px; padding:7px 11px; font-family:var(--font-mono); font-size:13px; margin-bottom:12px; color:var(--on-surface); }
+  .desc-body { padding:22px 22px 36px; line-height:1.7; }
+  .desc-body h1 { font-family:var(--font-display); font-size:24px; font-weight:700; letter-spacing:0.02em; margin:0 0 14px; color:var(--on-surface); }
+  .desc-body p { color:var(--on-surface-var); font-size:14px; margin-bottom:12px; }
+  .desc-body strong { color:var(--on-surface); }
+  .badge-row { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
+  .badge { padding:3px 11px; border-radius:100px; font-family:var(--font-body); font-size:11px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; }
+  .badge.easy { background:rgba(196,201,200,0.1); color:var(--tertiary); border:1px solid rgba(196,201,200,0.18); }
+  .badge.medium { background:rgba(146,204,255,0.08); color:var(--primary); border:1px solid rgba(146,204,255,0.18); }
+  .badge.hard { background:rgba(234,179,8,0.08); color:#eab308; border:1px solid rgba(234,179,8,0.18); }
+  .badge.tag { background:rgba(63,72,80,0.28); color:var(--on-surface-var); cursor:pointer; }
+  .badge.tag:hover { background:rgba(63,72,80,0.45); color:var(--on-surface); }
+  .code-block { background:rgba(63,72,80,0.16); border:1px solid rgba(63,72,80,0.16); border-radius:6px; padding:13px 15px; font-family:var(--font-mono); font-size:12.5px; color:var(--on-surface-var); margin:12px 0; line-height:1.75; }
+  .code-block .label { color:rgba(154,163,173,0.65); margin-right:6px; }
+  code { background:rgba(63,72,80,0.32); padding:2px 6px; border-radius:3px; font-family:var(--font-mono); font-size:0.88em; color:var(--on-surface); }
+  .section-title { font-family:var(--font-display); font-weight:700; font-size:14px; letter-spacing:0.06em; text-transform:uppercase; color:var(--on-surface); margin:22px 0 9px; }
+  #drag-overlay { display:none; position:fixed; inset:0; z-index:9999; }
+  #drag-overlay.col { cursor:col-resize; }
+  #drag-overlay.row { cursor:row-resize; }
+
+  /* Test result cards */
+  .tc-card { border-radius:6px; border:1px solid rgba(63,72,80,0.28); margin-bottom:8px; overflow:hidden; }
+  .tc-header { display:flex; align-items:center; gap:8px; padding:8px 14px; font-family:var(--font-body); font-size:12px; font-weight:700; cursor:pointer; transition:background 0.15s; }
+  .tc-header:hover { background:rgba(63,72,80,0.15); }
+  .tc-header.pass { background:rgba(74,222,128,0.06); border-left:3px solid var(--green); }
+  .tc-header.fail { background:rgba(248,113,113,0.06); border-left:3px solid var(--red); }
+  .tc-header.err  { background:rgba(251,191,36,0.06); border-left:3px solid var(--yellow); }
+  .tc-body { padding:10px 14px; background:rgba(20,20,20,0.4); display:none; font-family:var(--font-mono); font-size:11.5px; line-height:1.8; }
+  .tc-body.open { display:block; }
+  .tc-row-label { color:var(--on-surface-var); font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px; }
+  .tc-row-val { color:var(--on-surface); margin-bottom:8px; }
+
+  .result-summary { display:flex; align-items:center; gap:10px; padding:10px 14px; font-family:var(--font-body); font-size:13px; font-weight:700; border-radius:6px; margin-bottom:12px; }
+  .result-summary.all-pass { background:rgba(74,222,128,0.08); color:var(--green); border:1px solid rgba(74,222,128,0.2); }
+  .result-summary.some-fail { background:rgba(248,113,113,0.08); color:var(--red); border:1px solid rgba(248,113,113,0.2); }
+  .result-summary.compile-err { background:rgba(251,191,36,0.08); color:var(--yellow); border:1px solid rgba(251,191,36,0.2); }
+
+  @media (max-width: 768px) {
+    .split-container { flex-direction:column; }
+    .divider-v { display:none; }
+    .panel-left { width:100% !important; height:38vh; }
+    .panel-right { flex:1; }
+    .nav-links { display:none; }
+  }
 </style>
 </head>
 <body class="text-on-surface font-body selection:bg-primary/30">
 
-<!-- ══════════════════════════════════════════════
-     LANDING  (original design — do not change)
-══════════════════════════════════════════════ -->
+<!-- ══════════════════════ LANDING ══════════════════════ -->
 <div id="main-app-container" class="transition-all duration-300">
 
   <!-- TopAppBar -->
@@ -99,15 +220,13 @@
   </nav>
 
   <main id="landing" class="relative pb-32">
-
-    <!-- Video Background -->
     <div class="fixed inset-0 z-[-1] pointer-events-none">
       <video autoplay loop muted playsinline class="w-full h-full object-cover">
         <source src="../images/aboutBackground.mp4" type="video/mp4"/>
       </video>
     </div>
 
-    <!-- Hero Section -->
+    <!-- Hero -->
     <header class="max-w-screen-2xl mx-auto px-8 pt-24 pb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
       <div class="space-y-4">
         <h1 class="font-headline text-[clamp(3.5rem,10vw,6rem)] leading-[0.9] font-bold tracking-tighter uppercase italic">
@@ -115,10 +234,10 @@
         </h1>
       </div>
       <div class="flex flex-col items-start md:items-end gap-2 border-l md:border-l-0 md:border-r border-outline-variant/20 pl-6 md:pl-0 md:pr-6">
-        <span class="font-headline text-4xl font-bold tracking-tighter">0%</span>
+        <span id="global-mastery-pct" class="font-headline text-4xl font-bold tracking-tighter">0%</span>
         <span class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Global Mastery</span>
         <div class="w-32 h-1 bg-surface-container-high overflow-hidden rounded-full mt-2">
-          <div class="w-0 h-full bg-primary shadow-[0_0_10px_#92ccff]"></div>
+          <div id="global-mastery-bar" class="w-0 h-full bg-primary shadow-[0_0_10px_#92ccff] transition-all duration-700"></div>
         </div>
       </div>
     </header>
@@ -141,7 +260,7 @@
             <div class="flex items-center gap-4 py-4 border-y border-outline-variant/10">
               <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">15 Questions</span>
               <span class="w-1 h-1 rounded-full bg-outline-variant/40"></span>
-              <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/15 Completed</span>
+              <span id="nb-progress" class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/15 Completed</span>
             </div>
           </div>
           <button onclick="showQuestions('newBorn')"
@@ -167,7 +286,7 @@
             <div class="flex items-center gap-4 py-4 border-y border-outline-variant/10">
               <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">10 Questions</span>
               <span class="w-1 h-1 rounded-full bg-outline-variant/40"></span>
-              <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/10 Completed</span>
+              <span id="yb-progress" class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/10 Completed</span>
             </div>
           </div>
           <button onclick="showQuestions('youngBlood')"
@@ -197,7 +316,7 @@
             <div class="flex items-center gap-4 py-4 border-y border-outline-variant/10">
               <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">5 Questions</span>
               <span class="w-1 h-1 rounded-full bg-outline-variant/40"></span>
-              <span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/5 Completed</span>
+              <span id="m-progress" class="font-label text-xs uppercase tracking-widest text-on-surface-variant">0/5 Completed</span>
             </div>
           </div>
           <button onclick="showQuestions('master')"
@@ -228,8 +347,7 @@
 
     <!-- Questions List View -->
     <section id="questions-view" class="hidden max-w-screen-2xl mx-auto px-8 py-12">
-      <button onclick="hideQuestions()" class="mb-12 flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors"
-              style="background:none;border:none;cursor:pointer;">
+      <button onclick="hideQuestions()" class="mb-12 flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors" style="background:none;border:none;cursor:pointer;">
         <span class="material-symbols-outlined">arrow_back</span>
         <span class="font-label text-sm font-bold uppercase tracking-widest">Back to Grind</span>
       </button>
@@ -237,7 +355,6 @@
       <p id="qv-desc" class="text-on-surface-variant max-w-xl mb-10"></p>
       <div id="qv-list" class="flex flex-col gap-4"></div>
     </section>
-
   </main>
 
   <!-- Bottom Nav (mobile) -->
@@ -249,16 +366,12 @@
       </div>
     </div>
   </nav>
+</div>
 
-</div><!-- /#main-app-container -->
-
-<!-- ══════════════════════════════════════════════
-     WORKSPACE
-══════════════════════════════════════════════ -->
+<!-- ══════════════════════ WORKSPACE ══════════════════════ -->
 <div id="app" style="display:none;">
   <div id="drag-overlay"></div>
 
-  <!-- Navbar -->
   <nav class="ws-nav">
     <div class="nav-left">
       <a href="index.html" class="nav-logo">UNRAVEL</a>
@@ -269,19 +382,18 @@
       </button>
     </div>
     <div class="nav-center">
-      <button class="nav-btn ghost" onclick="runCode()">
+      <button class="nav-btn ghost" id="run-btn" onclick="runCode()">
         <span class="material-symbols-outlined">play_arrow</span> Run
       </button>
-      <button class="nav-btn primary">
+      <button class="nav-btn primary" id="submit-btn" onclick="submitCode()">
         <span class="material-symbols-outlined">cloud_upload</span> Submit
       </button>
     </div>
     <div class="nav-right">
       <div class="nav-links">
-        <a href="grind.html"         class="nav-link active">Grind</a>
+        <a href="grind.html" class="nav-link active">Grind</a>
         <a href="know_your_code.html" class="nav-link">Know Your &lt;/&gt;</a>
       </div>
-      <button class="icon-btn"><span class="material-symbols-outlined">settings</span></button>
       <div class="avatar">
         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNheccznngNZUJdC6lVP9B123_FP2eWAhxYTFvpxkD9YSFLQCuzFZ-lSPdHFYsHhTID-VxFpuq77Xo8g86V_vfsgafc0gNzMipqVbMxkgzeDrkp9ubZ1AmsQg2pRb4tB0K-si2fCQcVln53zO1g4F0OnrurRMIFnQnKqqfqfJIMK_cnqwrS3Q26FwK1wt2PRWTApgwTQQ7QGh3v2Eq4FgLi-0mBFRFT12rmgbWwFpuOl2YkGKcIT32AupR3CH9J7T1qovOZFzCkH9p" alt=""/>
       </div>
@@ -289,43 +401,17 @@
   </nav>
 
   <div class="split-container" id="split-container">
-
     <!-- LEFT: Problem Description -->
     <div class="panel panel-left" id="panel-left" style="width:420px;flex:0 0 420px;">
       <div class="panel-tabs">
-        <button class="tab-btn" data-tab="description"><span class="material-symbols-outlined">description</span> Description</button>
+        <button class="tab-btn active" data-tab="description"><span class="material-symbols-outlined">description</span> Description</button>
         <button class="tab-btn" data-tab="editorial"><span class="material-symbols-outlined">lightbulb</span> Editorial</button>
         <button class="tab-btn" data-tab="solutions"><span class="material-symbols-outlined">science</span> Solutions</button>
       </div>
       <div class="panel-body">
-        <div data-panel="description" class="tab-panel">
-          <div class="desc-body">
-            <h1 id="ws-title">1. The Mystery of Arrays</h1>
-            <div class="badge-row">
-              <span id="ws-diff" class="badge easy">Easy</span>
-              <span class="badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">sell</span> Topics</span>
-              <span class="badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">business_center</span> Companies</span>
-            </div>
-            <p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.</p>
-            <p>You may assume that each input would have <strong>exactly one solution</strong>, and you may not use the <em>same</em> element twice.</p>
-            <p>You can return the answer in any order.</p>
-            <div class="section-title">Example 1</div>
-            <div class="code-block">
-              <span class="label">Input:</span>  nums = [2,7,11,15], target = 9<br>
-              <span class="label">Output:</span> [0,1]<br>
-              <span class="label">Explanation:</span> nums[0] + nums[1] == 9 → return [0, 1].
-            </div>
-            <div class="section-title">Example 2</div>
-            <div class="code-block">
-              <span class="label">Input:</span>  nums = [3,2,4], target = 6<br>
-              <span class="label">Output:</span> [1,2]
-            </div>
-            <div class="section-title">Constraints</div>
-            <ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;font-family:var(--font-body);">
-              <li><code>2 ≤ nums.length ≤ 10⁴</code></li>
-              <li><code>-10⁹ ≤ nums[i] ≤ 10⁹</code></li>
-              <li>Only one valid answer exists.</li>
-            </ul>
+        <div data-panel="description" class="tab-panel active">
+          <div class="desc-body" id="ws-desc-body">
+            <!-- Populated dynamically -->
           </div>
         </div>
         <div data-panel="editorial" class="tab-panel">
@@ -341,15 +427,13 @@
 
     <!-- RIGHT: Editor + Console -->
     <div class="panel-right right-split" id="panel-right">
-
       <div class="editor-section panel" id="editor-section">
         <div class="panel-tabs">
           <button class="tab-btn active" style="color:var(--primary);border-bottom-color:var(--primary);">
             <span class="material-symbols-outlined">code</span> Code
           </button>
           <div style="margin-left:auto;display:flex;align-items:center;gap:4px;padding-right:8px;">
-            <button class="icon-btn" title="Reset"><span class="material-symbols-outlined">refresh</span></button>
-            <button class="icon-btn" title="Settings"><span class="material-symbols-outlined">settings</span></button>
+            <button class="icon-btn" title="Reset" onclick="resetCode()"><span class="material-symbols-outlined">refresh</span></button>
           </div>
         </div>
         <div class="editor-lang-bar">
@@ -358,13 +442,7 @@
           </button>
         </div>
         <div id="ace-container">
-          <div id="code-editor">class Solution {
-public:
-    vector&lt;int&gt; twoSum(vector&lt;int&gt;&amp; nums, int target) {
-        // Enter the void...
-        
-    }
-};</div>
+          <div id="code-editor"></div>
         </div>
       </div>
 
@@ -385,15 +463,8 @@ public:
 
         <div data-panel="testcase" class="tab-panel active">
           <div class="testcase-body">
-            <div class="case-tabs">
-              <button class="case-tab active" onclick="selectCase(this)">Case 1</button>
-              <button class="case-tab" onclick="selectCase(this)">Case 2</button>
-              <button class="case-tab" onclick="selectCase(this)">Case 3</button>
-            </div>
-            <div class="var-label">nums =</div>
-            <div class="var-value">[2,7,11,15]</div>
-            <div class="var-label">target =</div>
-            <div class="var-value">9</div>
+            <div class="case-tabs" id="case-tabs-row"></div>
+            <div id="case-display"></div>
           </div>
         </div>
 
@@ -412,14 +483,1009 @@ public:
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
-<script src="split-layout.js"></script>
-<script>
-/* ── Auth ── */
-// const u = JSON.parse(localStorage.getItem('user'));
-// if (!u) { alert('Login required'); window.location.href = 'login.html'; }
 
+<script>
+/* ════════════════════════════════════════════════════════
+   SPLIT LAYOUT (inline — no external file needed)
+════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+  const overlay = document.getElementById('drag-overlay');
+
+  function initVerticalDivider(dividerEl, leftEl, containerEl) {
+    let dragging = false, startX = 0, startW = 0;
+    dividerEl.addEventListener('mousedown', e => {
+      e.preventDefault(); dragging = true; startX = e.clientX;
+      startW = leftEl.getBoundingClientRect().width;
+      dividerEl.classList.add('dragging');
+      overlay.className = 'col'; overlay.style.display = 'block';
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const cw = containerEl.getBoundingClientRect().width;
+      const newW = Math.max(260, Math.min(startW + (e.clientX - startX), cw - 300));
+      leftEl.style.width = leftEl.style.flex = '';
+      leftEl.style.width = newW + 'px'; leftEl.style.flex = '0 0 ' + newW + 'px';
+      if (window._aceEditor) window._aceEditor.resize();
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return; dragging = false;
+      dividerEl.classList.remove('dragging'); overlay.style.display = 'none';
+      if (window._aceEditor) window._aceEditor.resize();
+    });
+  }
+
+  function initHorizontalDivider(dividerEl, editorEl, bottomEl, rightColEl) {
+    let dragging = false, startY = 0, startEdH = 0;
+    dividerEl.addEventListener('mousedown', e => {
+      e.preventDefault(); dragging = true; startY = e.clientY;
+      startEdH = editorEl.getBoundingClientRect().height;
+      dividerEl.classList.add('dragging');
+      overlay.className = 'row'; overlay.style.display = 'block';
+    });
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const colH = rightColEl.getBoundingClientRect().height;
+      const newEdH = Math.max(80, Math.min(startEdH + (e.clientY - startY), colH - 90));
+      editorEl.style.flex = '0 0 ' + newEdH + 'px';
+      bottomEl.style.height = Math.max(80, colH - newEdH - 12) + 'px';
+      if (window._aceEditor) window._aceEditor.resize();
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragging) return; dragging = false;
+      dividerEl.classList.remove('dragging'); overlay.style.display = 'none';
+      if (window._aceEditor) window._aceEditor.resize();
+    });
+  }
+
+  function initTabs(containerEl, defaultTab) {
+    const buttons = containerEl.querySelectorAll('[data-tab]');
+    const panels  = containerEl.querySelectorAll('[data-panel]');
+    function activate(tabId) {
+      buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+      panels.forEach(p  => p.classList.toggle('active', p.dataset.panel === tabId));
+    }
+    buttons.forEach(b => b.addEventListener('click', () => activate(b.dataset.tab)));
+    if (defaultTab) activate(defaultTab);
+    return { activate };
+  }
+
+  window.SplitLayout = { initVerticalDivider, initHorizontalDivider, initTabs };
+})();
+
+/* ════════════════════════════════════════════════════════
+   QUESTIONS DATA
+   Each question has:
+     - id, title, topic, difficulty, diffClass
+     - description (HTML)
+     - examples: [{ input, output, explanation? }]
+     - constraints: string[]
+     - testCases: [{ label, vars: [{name, value}], stdin, expectedOutput }]
+     - starterCode: { cpp: string }
+════════════════════════════════════════════════════════ */
+const QUESTIONS = {
+  newBorn: [
+    {
+      id: 1, title: "Two Sum", topic: "Arrays", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given an array of integers <code>nums</code> and an integer <code>target</code>, return <em>indices of the two numbers such that they add up to <code>target</code></em>.</p>
+<p>You may assume each input has <strong>exactly one solution</strong>, and you may not use the same element twice.</p>`,
+      examples: [
+        { input: "nums = [2,7,11,15], target = 9", output: "0 1", explanation: "nums[0] + nums[1] = 2 + 7 = 9." },
+        { input: "nums = [3,2,4], target = 6",     output: "1 2" },
+        { input: "nums = [3,3], target = 6",        output: "0 1" },
+      ],
+      constraints: ["2 ≤ nums.length ≤ 10⁴", "-10⁹ ≤ nums[i] ≤ 10⁹", "Only one valid answer exists."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[2,7,11,15]"},{name:"target",value:"9"}],  stdin:"4\n2 7 11 15\n9",   expectedOutput:"0 1" },
+        { label:"Case 2", vars:[{name:"nums",value:"[3,2,4]"},{name:"target",value:"6"}],       stdin:"3\n3 2 4\n6",        expectedOutput:"1 2" },
+        { label:"Case 3", vars:[{name:"nums",value:"[3,3]"},{name:"target",value:"6"}],         stdin:"2\n3 3\n6",           expectedOutput:"0 1" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+// Implement twoSum:
+// Read n, then n integers, then target from stdin.
+// Print the two 0-based indices separated by a space.
+
+vector<int> twoSum(vector<int>& nums, int target) {
+    // Your code here
+    
+}
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    int target; cin >> target;
+    auto res = twoSum(nums, target);
+    cout << res[0] << " " << res[1] << endl;
+    return 0;
+}` }
+    },
+    {
+      id: 2, title: "Reverse a String", topic: "Strings", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Write a function that reverses a string. The input is a single line string <code>s</code>.</p>
+<p>Print the reversed string.</p>`,
+      examples: [
+        { input: "hello",   output: "olleh" },
+        { input: "Hannah",  output: "hannaH" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 10⁵", "s consists of printable ASCII characters."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"hello\""}],   stdin:"hello",   expectedOutput:"olleh" },
+        { label:"Case 2", vars:[{name:"s",value:"\"Hannah\""}],  stdin:"Hannah",  expectedOutput:"hannaH" },
+        { label:"Case 3", vars:[{name:"s",value:"\"abcde\""}],   stdin:"abcde",   expectedOutput:"edcba" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s;
+    cin >> s;
+    // Reverse and print
+    
+    return 0;
+}` }
+    },
+    {
+      id: 3, title: "FizzBuzz", topic: "Math", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given an integer <code>n</code>, for each number from 1 to <code>n</code>:</p>
+<ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;">
+  <li>Print <strong>FizzBuzz</strong> if divisible by both 3 and 5.</li>
+  <li>Print <strong>Fizz</strong> if divisible by 3.</li>
+  <li>Print <strong>Buzz</strong> if divisible by 5.</li>
+  <li>Otherwise print the number itself.</li>
+</ul>
+<p>Each answer on a separate line.</p>`,
+      examples: [
+        { input: "n = 5", output: "1\n2\nFizz\n4\nBuzz" },
+        { input: "n = 15", output: "...FizzBuzz" },
+      ],
+      constraints: ["1 ≤ n ≤ 10⁴"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"n",value:"5"}],  stdin:"5",  expectedOutput:"1\n2\nFizz\n4\nBuzz" },
+        { label:"Case 2", vars:[{name:"n",value:"3"}],  stdin:"3",  expectedOutput:"1\n2\nFizz" },
+        { label:"Case 3", vars:[{name:"n",value:"15"}], stdin:"15", expectedOutput:"1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    for (int i = 1; i <= n; i++) {
+        // Your code here
+        
+    }
+    return 0;
+}` }
+    },
+    {
+      id: 4, title: "Palindrome Check", topic: "Strings", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given a string <code>s</code>, determine if it is a palindrome (reads the same forwards and backwards, case-insensitive, ignoring non-alphanumeric characters).</p>
+<p>Print <code>true</code> if palindrome, <code>false</code> otherwise.</p>`,
+      examples: [
+        { input: "A man a plan a canal Panama", output: "true" },
+        { input: "race a car",                  output: "false" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 2×10⁵"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"A man a plan a canal Panama\""}], stdin:"A man a plan a canal Panama", expectedOutput:"true" },
+        { label:"Case 2", vars:[{name:"s",value:"\"race a car\""}],                  stdin:"race a car",                  expectedOutput:"false" },
+        { label:"Case 3", vars:[{name:"s",value:"\"Was it a car or a cat I saw\""}], stdin:"Was it a car or a cat I saw", expectedOutput:"true" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string line;
+    getline(cin, line);
+    // Filter alphanumeric, lowercase, check palindrome
+    
+    return 0;
+}` }
+    },
+    {
+      id: 5, title: "Maximum Subarray", topic: "Dynamic Programming", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given an integer array <code>nums</code>, find the subarray with the largest sum and return its sum.</p>
+<p><em>(Kadane's Algorithm)</em></p>`,
+      examples: [
+        { input: "nums = [-2,1,-3,4,-1,2,1,-5,4]", output: "6", explanation: "Subarray [4,-1,2,1] has sum 6." },
+        { input: "nums = [1]",                       output: "1" },
+        { input: "nums = [5,4,-1,7,8]",              output: "23" },
+      ],
+      constraints: ["1 ≤ nums.length ≤ 10⁵", "-10⁴ ≤ nums[i] ≤ 10⁴"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[-2,1,-3,4,-1,2,1,-5,4]"}], stdin:"9\n-2 1 -3 4 -1 2 1 -5 4", expectedOutput:"6" },
+        { label:"Case 2", vars:[{name:"nums",value:"[1]"}],                       stdin:"1\n1",                      expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"nums",value:"[5,4,-1,7,8]"}],              stdin:"5\n5 4 -1 7 8",              expectedOutput:"23" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    // Kadane's algorithm — print max sum
+    
+    return 0;
+}` }
+    },
+    {
+      id: 6, title: "Missing Number", topic: "Bit Manipulation", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given an array <code>nums</code> containing <code>n</code> distinct numbers in the range <code>[0, n]</code>, return the only number in the range that is missing from the array.</p>`,
+      examples: [
+        { input: "nums = [3,0,1]", output: "2" },
+        { input: "nums = [0,1]",   output: "2" },
+        { input: "nums = [9,6,4,2,3,5,7,0,1]", output: "8" },
+      ],
+      constraints: ["n == nums.length", "1 ≤ n ≤ 10⁴", "0 ≤ nums[i] ≤ n", "All nums are unique."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[3,0,1]"}],               stdin:"3\n3 0 1",           expectedOutput:"2" },
+        { label:"Case 2", vars:[{name:"nums",value:"[0,1]"}],                  stdin:"2\n0 1",             expectedOutput:"2" },
+        { label:"Case 3", vars:[{name:"nums",value:"[9,6,4,2,3,5,7,0,1]"}],   stdin:"9\n9 6 4 2 3 5 7 0 1", expectedOutput:"8" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    // Find missing number in [0..n] — print it
+    
+    return 0;
+}` }
+    },
+    {
+      id: 7, title: "Valid Parentheses", topic: "Stacks", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given a string <code>s</code> containing just the characters <code>'('</code>, <code>')'</code>, <code>'{'</code>, <code>'}'</code>, <code>'['</code> and <code>']'</code>, determine if the input string is valid.</p>
+<p>A string is valid if every open bracket is closed by the same type in the correct order.</p>`,
+      examples: [
+        { input: "()",     output: "true" },
+        { input: "()[]{}", output: "true" },
+        { input: "(]",     output: "false" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 10⁴", "s consists of parentheses only."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"()\""}],     stdin:"()",     expectedOutput:"true" },
+        { label:"Case 2", vars:[{name:"s",value:"\"()[]{}\""}, ], stdin:"()[]{}", expectedOutput:"true" },
+        { label:"Case 3", vars:[{name:"s",value:"\"(]\""}],     stdin:"(]",     expectedOutput:"false" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s; cin >> s;
+    stack<char> st;
+    // Use a stack to validate brackets
+    
+    return 0;
+}` }
+    },
+    {
+      id: 8, title: "Count Vowels", topic: "Strings", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given a string <code>s</code>, count the number of vowels (<code>a, e, i, o, u</code>, case-insensitive) and print the count.</p>`,
+      examples: [
+        { input: "Hello World", output: "3" },
+        { input: "aeiou",       output: "5" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 10⁵"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"Hello World\""}], stdin:"Hello World", expectedOutput:"3" },
+        { label:"Case 2", vars:[{name:"s",value:"\"aeiou\""}],       stdin:"aeiou",       expectedOutput:"5" },
+        { label:"Case 3", vars:[{name:"s",value:"\"rhythm\""}],      stdin:"rhythm",      expectedOutput:"0" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string line;
+    getline(cin, line);
+    int count = 0;
+    string vowels = "aeiouAEIOU";
+    // Count vowels and print count
+    
+    return 0;
+}` }
+    },
+    {
+      id: 9, title: "Sum of Digits", topic: "Math", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given a non-negative integer <code>n</code>, compute and print the sum of its digits.</p>`,
+      examples: [
+        { input: "123",   output: "6" },
+        { input: "9999",  output: "36" },
+        { input: "10001", output: "2" },
+      ],
+      constraints: ["0 ≤ n ≤ 10¹⁸"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"n",value:"123"}],   stdin:"123",   expectedOutput:"6" },
+        { label:"Case 2", vars:[{name:"n",value:"9999"}],  stdin:"9999",  expectedOutput:"36" },
+        { label:"Case 3", vars:[{name:"n",value:"10001"}], stdin:"10001", expectedOutput:"2" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string n; cin >> n;
+    int sum = 0;
+    // Sum digits of n and print
+    
+    return 0;
+}` }
+    },
+    {
+      id: 10, title: "Power of Two", topic: "Bit Manipulation", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given an integer <code>n</code>, return <code>true</code> if it is a power of two. Otherwise, return <code>false</code>.</p>`,
+      examples: [
+        { input: "1",  output: "true",  explanation: "2⁰ = 1" },
+        { input: "16", output: "true",  explanation: "2⁴ = 16" },
+        { input: "3",  output: "false" },
+      ],
+      constraints: ["-2³¹ ≤ n ≤ 2³¹ - 1"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"n",value:"1"}],  stdin:"1",  expectedOutput:"true" },
+        { label:"Case 2", vars:[{name:"n",value:"16"}], stdin:"16", expectedOutput:"true" },
+        { label:"Case 3", vars:[{name:"n",value:"3"}],  stdin:"3",  expectedOutput:"false" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    long long n; cin >> n;
+    // Check if n is a power of 2 and print true/false
+    
+    return 0;
+}` }
+    },
+    {
+      id: 11, title: "Fibonacci Number", topic: "Dynamic Programming", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given <code>n</code>, compute <code>F(n)</code> where F(0) = 0, F(1) = 1, and F(n) = F(n-1) + F(n-2).</p>`,
+      examples: [
+        { input: "2", output: "1" },
+        { input: "3", output: "2" },
+        { input: "4", output: "3" },
+      ],
+      constraints: ["0 ≤ n ≤ 30"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"n",value:"2"}],  stdin:"2",  expectedOutput:"1" },
+        { label:"Case 2", vars:[{name:"n",value:"5"}],  stdin:"5",  expectedOutput:"5" },
+        { label:"Case 3", vars:[{name:"n",value:"10"}], stdin:"10", expectedOutput:"55" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    // Compute F(n) and print
+    
+    return 0;
+}` }
+    },
+    {
+      id: 12, title: "Remove Duplicates", topic: "Arrays", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given a sorted array <code>nums</code>, remove duplicates in-place so each element appears only once. Print the resulting array elements separated by spaces.</p>`,
+      examples: [
+        { input: "nums = [1,1,2]",              output: "1 2" },
+        { input: "nums = [0,0,1,1,1,2,2,3,3,4]", output: "0 1 2 3 4" },
+      ],
+      constraints: ["1 ≤ nums.length ≤ 3×10⁴", "-100 ≤ nums[i] ≤ 100", "nums is sorted ascending."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[1,1,2]"}],                 stdin:"3\n1 1 2",               expectedOutput:"1 2" },
+        { label:"Case 2", vars:[{name:"nums",value:"[0,0,1,1,1,2,2,3,3,4]"}],  stdin:"10\n0 0 1 1 1 2 2 3 3 4", expectedOutput:"0 1 2 3 4" },
+        { label:"Case 3", vars:[{name:"nums",value:"[1,1,1,1]"}],               stdin:"4\n1 1 1 1",              expectedOutput:"1" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    // Remove duplicates and print unique elements
+    
+    return 0;
+}` }
+    },
+    {
+      id: 13, title: "Climbing Stairs", topic: "Dynamic Programming", difficulty: "Easy", diffClass: "easy",
+      description: `<p>You are climbing a staircase. It takes <code>n</code> steps to reach the top. Each time you can climb 1 or 2 steps. In how many distinct ways can you climb to the top?</p>`,
+      examples: [
+        { input: "n = 2", output: "2", explanation: "1+1 or 2." },
+        { input: "n = 3", output: "3", explanation: "1+1+1, 1+2, or 2+1." },
+      ],
+      constraints: ["1 ≤ n ≤ 45"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"n",value:"2"}],  stdin:"2",  expectedOutput:"2" },
+        { label:"Case 2", vars:[{name:"n",value:"3"}],  stdin:"3",  expectedOutput:"3" },
+        { label:"Case 3", vars:[{name:"n",value:"10"}], stdin:"10", expectedOutput:"89" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    // Count distinct ways to climb n stairs
+    
+    return 0;
+}` }
+    },
+    {
+      id: 14, title: "Best Time to Buy Stock", topic: "Arrays", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given an array <code>prices</code> where <code>prices[i]</code> is the price on day <code>i</code>, find the maximum profit from one buy-sell transaction. If no profit is possible, return 0.</p>`,
+      examples: [
+        { input: "prices = [7,1,5,3,6,4]", output: "5", explanation: "Buy day 2 (price 1), sell day 5 (price 6)." },
+        { input: "prices = [7,6,4,3,1]",   output: "0", explanation: "Prices always fall; no profit." },
+      ],
+      constraints: ["1 ≤ prices.length ≤ 10⁵", "0 ≤ prices[i] ≤ 10⁴"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"prices",value:"[7,1,5,3,6,4]"}], stdin:"6\n7 1 5 3 6 4", expectedOutput:"5" },
+        { label:"Case 2", vars:[{name:"prices",value:"[7,6,4,3,1]"}],   stdin:"5\n7 6 4 3 1",   expectedOutput:"0" },
+        { label:"Case 3", vars:[{name:"prices",value:"[2,4,1]"}],        stdin:"3\n2 4 1",        expectedOutput:"2" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> prices(n);
+    for (int& x : prices) cin >> x;
+    // Find max profit and print it
+    
+    return 0;
+}` }
+    },
+    {
+      id: 15, title: "Single Number", topic: "Bit Manipulation", difficulty: "Easy", diffClass: "easy",
+      description: `<p>Given a non-empty array of integers <code>nums</code>, every element appears <strong>twice</strong> except for one. Find that single one.</p>
+<p>Implement with <strong>O(1)</strong> extra space.</p>`,
+      examples: [
+        { input: "nums = [2,2,1]",       output: "1" },
+        { input: "nums = [4,1,2,1,2]",   output: "4" },
+        { input: "nums = [1]",            output: "1" },
+      ],
+      constraints: ["1 ≤ nums.length ≤ 3×10⁴", "-3×10⁴ ≤ nums[i] ≤ 3×10⁴", "All appear twice except one."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[2,2,1]"}],     stdin:"3\n2 2 1",       expectedOutput:"1" },
+        { label:"Case 2", vars:[{name:"nums",value:"[4,1,2,1,2]"}], stdin:"5\n4 1 2 1 2",   expectedOutput:"4" },
+        { label:"Case 3", vars:[{name:"nums",value:"[1]"}],          stdin:"1\n1",            expectedOutput:"1" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    // XOR trick — print the single number
+    
+    return 0;
+}` }
+    },
+  ],
+
+  youngBlood: [
+    {
+      id: 1, title: "Longest Substring Without Repeating", topic: "Sliding Window", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given a string <code>s</code>, find the length of the <strong>longest substring without repeating characters</strong>.</p>`,
+      examples: [
+        { input: "abcabcbb", output: "3", explanation: "\"abc\" has length 3." },
+        { input: "bbbbb",    output: "1", explanation: "\"b\" has length 1." },
+        { input: "pwwkew",   output: "3", explanation: "\"wke\" has length 3." },
+      ],
+      constraints: ["0 ≤ s.length ≤ 5×10⁴", "s consists of English letters, digits, symbols and spaces."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"abcabcbb\""}], stdin:"abcabcbb", expectedOutput:"3" },
+        { label:"Case 2", vars:[{name:"s",value:"\"bbbbb\""}],    stdin:"bbbbb",    expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"s",value:"\"pwwkew\""}],   stdin:"pwwkew",   expectedOutput:"3" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s; cin >> s;
+    // Sliding window — print max length
+    
+    return 0;
+}` }
+    },
+    {
+      id: 2, title: "Add Two Numbers (Linked List)", topic: "Linked Lists", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Two non-empty linked lists represent two non-negative integers stored in <strong>reverse order</strong>. Add them and return the sum as a linked list in reverse order.</p>
+<p>Input: Two lines, each with space-separated digits (already reversed). Output: Space-separated digits of the sum list (reversed).</p>`,
+      examples: [
+        { input: "2 4 3\n5 6 4", output: "7 0 8", explanation: "342 + 465 = 807 → [7,0,8]" },
+        { input: "0\n0",          output: "0" },
+        { input: "9 9 9 9 9 9 9\n9 9 9 9", output: "8 9 9 9 0 0 0 1" },
+      ],
+      constraints: ["1 ≤ list length ≤ 100", "0 ≤ Node.val ≤ 9", "No leading zeros (except 0 itself)."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"l1",value:"[2,4,3]"},{name:"l2",value:"[5,6,4]"}],             stdin:"3\n2 4 3\n3\n5 6 4",           expectedOutput:"7 0 8" },
+        { label:"Case 2", vars:[{name:"l1",value:"[0]"},{name:"l2",value:"[0]"}],                       stdin:"1\n0\n1\n0",                    expectedOutput:"0" },
+        { label:"Case 3", vars:[{name:"l1",value:"[9,9,9,9,9,9,9]"},{name:"l2",value:"[9,9,9,9]"}],   stdin:"7\n9 9 9 9 9 9 9\n4\n9 9 9 9", expectedOutput:"8 9 9 9 0 0 0 1" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n1; cin >> n1;
+    vector<int> a(n1);
+    for (int& x : a) cin >> x;
+    int n2; cin >> n2;
+    vector<int> b(n2);
+    for (int& x : b) cin >> x;
+    // Simulate addition with carry, print result digits separated by spaces
+    
+    return 0;
+}` }
+    },
+    {
+      id: 3, title: "Longest Palindromic Substring", topic: "Dynamic Programming", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given a string <code>s</code>, return the longest palindromic substring.</p>
+<p>If multiple answers of same length exist, return the first one found (leftmost).</p>`,
+      examples: [
+        { input: "babad", output: "bab", explanation: "\"aba\" is also valid." },
+        { input: "cbbd",  output: "bb" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 1000", "s consists of digits and English letters."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"babad\""}], stdin:"babad", expectedOutput:"bab" },
+        { label:"Case 2", vars:[{name:"s",value:"\"cbbd\""}],  stdin:"cbbd",  expectedOutput:"bb" },
+        { label:"Case 3", vars:[{name:"s",value:"\"a\""}],     stdin:"a",     expectedOutput:"a" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s; cin >> s;
+    // Find and print the longest palindromic substring
+    
+    return 0;
+}` }
+    },
+    {
+      id: 4, title: "Container With Most Water", topic: "Two Pointers", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given integer array <code>height</code> of length <code>n</code>, there are <code>n</code> vertical lines. Find two lines that together with the x-axis form a container that holds the most water. Return the maximum water.</p>`,
+      examples: [
+        { input: "height = [1,8,6,2,5,4,8,3,7]", output: "49" },
+        { input: "height = [1,1]",                  output: "1" },
+      ],
+      constraints: ["n == height.length", "2 ≤ n ≤ 10⁵", "0 ≤ height[i] ≤ 10⁴"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"height",value:"[1,8,6,2,5,4,8,3,7]"}], stdin:"9\n1 8 6 2 5 4 8 3 7", expectedOutput:"49" },
+        { label:"Case 2", vars:[{name:"height",value:"[1,1]"}],                 stdin:"2\n1 1",                expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"height",value:"[4,3,2,1,4]"}],           stdin:"5\n4 3 2 1 4",          expectedOutput:"16" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> h(n);
+    for (int& x : h) cin >> x;
+    // Two pointer approach — print max water
+    
+    return 0;
+}` }
+    },
+    {
+      id: 5, title: "3Sum", topic: "Two Pointers", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given an integer array <code>nums</code>, return all unique triplets <code>[nums[i], nums[j], nums[k]]</code> such that <code>i != j != k</code> and <code>nums[i] + nums[j] + nums[k] == 0</code>.</p>
+<p>Print each triplet on a new line, values space-separated. Triplets in sorted order, one per line.</p>`,
+      examples: [
+        { input: "nums = [-1,0,1,2,-1,-4]", output: "-1 -1 2\n-1 0 1" },
+        { input: "nums = [0,1,1]",            output: "" },
+        { input: "nums = [0,0,0]",            output: "0 0 0" },
+      ],
+      constraints: ["3 ≤ nums.length ≤ 3000", "-10⁵ ≤ nums[i] ≤ 10⁵"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[-1,0,1,2,-1,-4]"}], stdin:"6\n-1 0 1 2 -1 -4", expectedOutput:"-1 -1 2\n-1 0 1" },
+        { label:"Case 2", vars:[{name:"nums",value:"[0,1,1]"}],           stdin:"3\n0 1 1",           expectedOutput:"" },
+        { label:"Case 3", vars:[{name:"nums",value:"[0,0,0]"}],           stdin:"3\n0 0 0",           expectedOutput:"0 0 0" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    sort(nums.begin(), nums.end());
+    // Two-pointer 3Sum — print each triplet on a new line
+    
+    return 0;
+}` }
+    },
+    {
+      id: 6, title: "Binary Tree Level Order", topic: "Trees", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given the root of a binary tree, return its <strong>level order traversal</strong>.</p>
+<p>Input: level-order input where <code>-1</code> means null. Output: each level's values space-separated on its own line.</p>`,
+      examples: [
+        { input: "3 9 20 -1 -1 15 7", output: "3\n9 20\n15 7" },
+        { input: "1",                  output: "1" },
+      ],
+      constraints: ["0 ≤ Nodes ≤ 2000", "-1000 ≤ Node.val ≤ 1000"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"root",value:"[3,9,20,null,null,15,7]"}], stdin:"7\n3 9 20 -1 -1 15 7", expectedOutput:"3\n9 20\n15 7" },
+        { label:"Case 2", vars:[{name:"root",value:"[1]"}],                      stdin:"1\n1",                  expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"root",value:"[1,2,3,4,5]"}],              stdin:"5\n1 2 3 4 5",          expectedOutput:"1\n2 3\n4 5" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+struct TreeNode { int val; TreeNode *left, *right; TreeNode(int x): val(x), left(nullptr), right(nullptr){} };
+
+TreeNode* build(vector<int>& v, int i) {
+    if (i >= (int)v.size() || v[i] == -1) return nullptr;
+    TreeNode* node = new TreeNode(v[i]);
+    node->left  = build(v, 2*i+1);
+    node->right = build(v, 2*i+2);
+    return node;
+}
+
+int main() {
+    int n; cin >> n;
+    vector<int> v(n);
+    for (int& x : v) cin >> x;
+    TreeNode* root = build(v, 0);
+    // BFS level order — print each level on its own line
+    
+    return 0;
+}` }
+    },
+    {
+      id: 7, title: "Number of Islands", topic: "Graphs", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given an <code>m×n</code> grid of <code>'1'</code>s (land) and <code>'0'</code>s (water), count the number of islands.</p>
+<p>Input: m and n, then m rows of n characters. Output: island count.</p>`,
+      examples: [
+        { input: "4 5\n11110\n11010\n11000\n00000", output: "1" },
+        { input: "4 5\n11000\n11000\n00100\n00011", output: "3" },
+      ],
+      constraints: ["1 ≤ m, n ≤ 300"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"grid",value:"4x5"}], stdin:"4 5\n11110\n11010\n11000\n00000", expectedOutput:"1" },
+        { label:"Case 2", vars:[{name:"grid",value:"4x5"}], stdin:"4 5\n11000\n11000\n00100\n00011", expectedOutput:"3" },
+        { label:"Case 3", vars:[{name:"grid",value:"2x2"}], stdin:"2 2\n11\n11",                     expectedOutput:"1" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+void dfs(vector<string>& g, int r, int c) {
+    if (r<0||r>=(int)g.size()||c<0||c>=(int)g[0].size()||g[r][c]!='1') return;
+    g[r][c]='0';
+    dfs(g,r+1,c); dfs(g,r-1,c); dfs(g,r,c+1); dfs(g,r,c-1);
+}
+
+int main() {
+    int m, n; cin >> m >> n;
+    vector<string> grid(m);
+    for (string& row : grid) cin >> row;
+    int islands = 0;
+    // Count islands with DFS/BFS — print count
+    
+    return 0;
+}` }
+    },
+    {
+      id: 8, title: "Coin Change", topic: "Dynamic Programming", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given an array of coin denominations and a target <code>amount</code>, return the fewest number of coins needed to make the amount. If impossible, return <code>-1</code>.</p>`,
+      examples: [
+        { input: "coins = [1,5,11], amount = 15", output: "3", explanation: "5+5+5 = 15." },
+        { input: "coins = [2], amount = 3",        output: "-1" },
+        { input: "coins = [1], amount = 0",         output: "0" },
+      ],
+      constraints: ["1 ≤ coins.length ≤ 12", "1 ≤ coins[i] ≤ 2³¹-1", "0 ≤ amount ≤ 10⁴"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"coins",value:"[1,5,11]"},{name:"amount",value:"15"}], stdin:"3\n1 5 11\n15", expectedOutput:"3" },
+        { label:"Case 2", vars:[{name:"coins",value:"[2]"},{name:"amount",value:"3"}],        stdin:"1\n2\n3",       expectedOutput:"-1" },
+        { label:"Case 3", vars:[{name:"coins",value:"[1]"},{name:"amount",value:"0"}],        stdin:"1\n1\n0",       expectedOutput:"0" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int k; cin >> k;
+    vector<int> coins(k);
+    for (int& c : coins) cin >> c;
+    int amount; cin >> amount;
+    // DP coin change — print min coins or -1
+    
+    return 0;
+}` }
+    },
+    {
+      id: 9, title: "Word Break", topic: "Dynamic Programming", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given a string <code>s</code> and a dictionary of words, return <code>true</code> if <code>s</code> can be segmented into space-separated dictionary words.</p>
+<p>Input: string s, then n (word count), then n words. Output: <code>true</code> or <code>false</code>.</p>`,
+      examples: [
+        { input: "leetcode\n2\nleet code", output: "true" },
+        { input: "applepenapple\n2\napple pen", output: "true" },
+        { input: "catsandog\n3\ncats dog sand", output: "false" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 300", "1 ≤ wordDict.length ≤ 1000"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"leetcode\""},{name:"dict",value:"[\"leet\",\"code\"]"}],       stdin:"leetcode\n2\nleet\ncode",             expectedOutput:"true" },
+        { label:"Case 2", vars:[{name:"s",value:"\"applepenapple\""},{name:"dict",value:"[\"apple\",\"pen\"]"}],  stdin:"applepenapple\n2\napple\npen",         expectedOutput:"true" },
+        { label:"Case 3", vars:[{name:"s",value:"\"catsandog\""},{name:"dict",value:"[\"cats\",\"dog\",\"sand\"]"}], stdin:"catsandog\n3\ncats\ndog\nsand",    expectedOutput:"false" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s; cin >> s;
+    int n; cin >> n;
+    unordered_set<string> dict;
+    for (int i=0;i<n;i++) { string w; cin>>w; dict.insert(w); }
+    // DP word break — print true/false
+    
+    return 0;
+}` }
+    },
+    {
+      id: 10, title: "Product of Array Except Self", topic: "Arrays", difficulty: "Medium", diffClass: "medium",
+      description: `<p>Given integer array <code>nums</code>, return array <code>answer</code> such that <code>answer[i]</code> is the product of all elements except <code>nums[i]</code>.</p>
+<p>Solve in <strong>O(n)</strong> without division. Print the answer array space-separated.</p>`,
+      examples: [
+        { input: "nums = [1,2,3,4]",        output: "24 12 8 6" },
+        { input: "nums = [-1,1,0,-3,3]",    output: "0 0 9 0 0" },
+      ],
+      constraints: ["2 ≤ nums.length ≤ 10⁵", "-30 ≤ nums[i] ≤ 30", "Product fits in 32-bit integer."],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[1,2,3,4]"}],      stdin:"4\n1 2 3 4",      expectedOutput:"24 12 8 6" },
+        { label:"Case 2", vars:[{name:"nums",value:"[-1,1,0,-3,3]"}],  stdin:"5\n-1 1 0 -3 3",  expectedOutput:"0 0 9 0 0" },
+        { label:"Case 3", vars:[{name:"nums",value:"[2,3,4,5]"}],      stdin:"4\n2 3 4 5",      expectedOutput:"60 40 30 24" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    // Prefix/suffix product — print answer space-separated
+    
+    return 0;
+}` }
+    },
+  ],
+
+  master: [
+    {
+      id: 1, title: "Median of Two Sorted Arrays", topic: "Binary Search", difficulty: "Hard", diffClass: "hard",
+      description: `<p>Given two sorted arrays <code>nums1</code> and <code>nums2</code> of size <code>m</code> and <code>n</code>, return the <strong>median</strong> of the two sorted arrays.</p>
+<p>The overall run time complexity must be <strong>O(log(m+n))</strong>.</p>
+<p>Print the median with exactly 5 decimal places if it's a half-integer (e.g. 2.50000), or as an integer with .00000 otherwise.</p>`,
+      examples: [
+        { input: "nums1=[1,3] nums2=[2]",   output: "2.00000", explanation: "Merged: [1,2,3] → median 2." },
+        { input: "nums1=[1,2] nums2=[3,4]", output: "2.50000", explanation: "Merged: [1,2,3,4] → median 2.5." },
+      ],
+      constraints: ["0 ≤ m, n ≤ 1000", "1 ≤ m+n ≤ 2000", "-10⁶ ≤ nums[i] ≤ 10⁶"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums1",value:"[1,3]"},{name:"nums2",value:"[2]"}],   stdin:"2\n1 3\n1\n2",     expectedOutput:"2.00000" },
+        { label:"Case 2", vars:[{name:"nums1",value:"[1,2]"},{name:"nums2",value:"[3,4]"}], stdin:"2\n1 2\n2\n3 4",   expectedOutput:"2.50000" },
+        { label:"Case 3", vars:[{name:"nums1",value:"[0,0]"},{name:"nums2",value:"[0,0]"}], stdin:"2\n0 0\n2\n0 0",   expectedOutput:"0.00000" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int m; cin >> m;
+    vector<int> a(m); for (int& x : a) cin >> x;
+    int n; cin >> n;
+    vector<int> b(n); for (int& x : b) cin >> x;
+    // Binary search median — print with 5 decimal places
+    cout << fixed << setprecision(5);
+    
+    return 0;
+}` }
+    },
+    {
+      id: 2, title: "Serialize and Deserialize Binary Tree", topic: "Trees", difficulty: "Hard", diffClass: "hard",
+      description: `<p>Design an algorithm to serialize and deserialize a binary tree.</p>
+<p>Input: level-order tree values (-1 = null). Serialize to string, deserialize back, then print level-order traversal (each level space-separated on its own line).</p>`,
+      examples: [
+        { input: "1 2 3 -1 -1 4 5", output: "1\n2 3\n4 5" },
+        { input: "-1",              output: "" },
+      ],
+      constraints: ["0 ≤ Nodes ≤ 10⁴", "-1000 ≤ Node.val ≤ 1000"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"root",value:"[1,2,3,null,null,4,5]"}], stdin:"7\n1 2 3 -1 -1 4 5", expectedOutput:"1\n2 3\n4 5" },
+        { label:"Case 2", vars:[{name:"root",value:"[]"}],                     stdin:"1\n-1",              expectedOutput:"" },
+        { label:"Case 3", vars:[{name:"root",value:"[1,2]"}],                  stdin:"3\n1 2 -1",          expectedOutput:"1\n2" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+struct TreeNode { int val; TreeNode *left, *right; TreeNode(int x):val(x),left(nullptr),right(nullptr){} };
+
+string serialize(TreeNode* root) {
+    // Your code here
+    return "";
+}
+
+TreeNode* deserialize(string data) {
+    // Your code here
+    return nullptr;
+}
+
+int main() {
+    int n; cin >> n;
+    vector<int> v(n); for (int& x : v) cin >> x;
+    // Build tree, serialize, deserialize, print level order
+    
+    return 0;
+}` }
+    },
+    {
+      id: 3, title: "Trapping Rain Water", topic: "Two Pointers", difficulty: "Hard", diffClass: "hard",
+      description: `<p>Given <code>n</code> non-negative integers representing an elevation map where each bar has width 1, compute how much water can be trapped after raining.</p>`,
+      examples: [
+        { input: "height = [0,1,0,2,1,0,1,3,2,1,2,1]", output: "6" },
+        { input: "height = [4,2,0,3,2,5]",              output: "9" },
+      ],
+      constraints: ["n == height.length", "1 ≤ n ≤ 2×10⁴", "0 ≤ height[i] ≤ 10⁵"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"height",value:"[0,1,0,2,1,0,1,3,2,1,2,1]"}], stdin:"12\n0 1 0 2 1 0 1 3 2 1 2 1", expectedOutput:"6" },
+        { label:"Case 2", vars:[{name:"height",value:"[4,2,0,3,2,5]"}],               stdin:"6\n4 2 0 3 2 5",               expectedOutput:"9" },
+        { label:"Case 3", vars:[{name:"height",value:"[3,0,2,0,4]"}],                 stdin:"5\n3 0 2 0 4",                 expectedOutput:"7" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> h(n);
+    for (int& x : h) cin >> x;
+    // Two-pointer or prefix max approach — print total water
+    
+    return 0;
+}` }
+    },
+    {
+      id: 4, title: "Regular Expression Matching", topic: "Dynamic Programming", difficulty: "Hard", diffClass: "hard",
+      description: `<p>Given an input string <code>s</code> and a pattern <code>p</code>, implement regular expression matching with <code>'.'</code> (any character) and <code>'*'</code> (zero or more of preceding).</p>
+<p>Print <code>true</code> if the entire string matches, <code>false</code> otherwise.</p>`,
+      examples: [
+        { input: "s=\"aa\" p=\"a\"",    output: "false" },
+        { input: "s=\"aa\" p=\"a*\"",   output: "true" },
+        { input: "s=\"ab\" p=\".*\"",   output: "true" },
+      ],
+      constraints: ["1 ≤ s.length ≤ 20", "1 ≤ p.length ≤ 30"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"s",value:"\"aa\""},{name:"p",value:"\"a\""}],   stdin:"aa\na",   expectedOutput:"false" },
+        { label:"Case 2", vars:[{name:"s",value:"\"aa\""},{name:"p",value:"\"a*\""}],  stdin:"aa\na*",  expectedOutput:"true" },
+        { label:"Case 3", vars:[{name:"s",value:"\"ab\""},{name:"p",value:"\".*\""}],  stdin:"ab\n.*",  expectedOutput:"true" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    string s, p;
+    cin >> s >> p;
+    // DP regex matching — print true/false
+    
+    return 0;
+}` }
+    },
+    {
+      id: 5, title: "Sliding Window Maximum", topic: "Sliding Window", difficulty: "Hard", diffClass: "hard",
+      description: `<p>Given an array <code>nums</code> of integers and a window size <code>k</code>, return the maximum value in each window as it slides from left to right.</p>
+<p>Print the maximums space-separated.</p>`,
+      examples: [
+        { input: "nums=[1,3,-1,-3,5,3,6,7] k=3", output: "3 3 5 5 6 7" },
+        { input: "nums=[1] k=1",                   output: "1" },
+      ],
+      constraints: ["1 ≤ nums.length ≤ 10⁵", "-10⁴ ≤ nums[i] ≤ 10⁴", "1 ≤ k ≤ nums.length"],
+      testCases: [
+        { label:"Case 1", vars:[{name:"nums",value:"[1,3,-1,-3,5,3,6,7]"},{name:"k",value:"3"}], stdin:"8\n1 3 -1 -3 5 3 6 7\n3", expectedOutput:"3 3 5 5 6 7" },
+        { label:"Case 2", vars:[{name:"nums",value:"[1]"},{name:"k",value:"1"}],                  stdin:"1\n1\n1",                  expectedOutput:"1" },
+        { label:"Case 3", vars:[{name:"nums",value:"[9,11]"},{name:"k",value:"2"}],               stdin:"2\n9 11\n2",               expectedOutput:"11" },
+      ],
+      starterCode: { cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n; cin >> n;
+    vector<int> nums(n);
+    for (int& x : nums) cin >> x;
+    int k; cin >> k;
+    // Monotonic deque — print window maxima space-separated
+    
+    return 0;
+}` }
+    },
+  ],
+};
+
+/* Completion tracking */
+const completed = JSON.parse(localStorage.getItem('unravel_completed') || '{}');
+function markCompleted(tierKey, id) {
+  if (!completed[tierKey]) completed[tierKey] = {};
+  completed[tierKey][id] = true;
+  localStorage.setItem('unravel_completed', JSON.stringify(completed));
+  updateMastery();
+}
+function isCompleted(tierKey, id) {
+  return !!(completed[tierKey] && completed[tierKey][id]);
+}
+function updateMastery() {
+  const total = 15 + 10 + 5;
+  let done = 0;
+  for (const tk of ['newBorn','youngBlood','master']) {
+    done += Object.keys(completed[tk] || {}).length;
+  }
+  const pct = Math.round(done / total * 100);
+  document.getElementById('global-mastery-pct').textContent = pct + '%';
+  document.getElementById('global-mastery-bar').style.width = pct + '%';
+  // per-tier
+  const nbDone = Object.keys(completed.newBorn || {}).length;
+  const ybDone = Object.keys(completed.youngBlood || {}).length;
+  const mDone  = Object.keys(completed.master || {}).length;
+  document.getElementById('nb-progress').textContent = `${nbDone}/15 Completed`;
+  document.getElementById('yb-progress').textContent = `${ybDone}/10 Completed`;
+  document.getElementById('m-progress').textContent  = `${mDone}/5 Completed`;
+}
+updateMastery();
+
+/* ════════════════════════════════════════════════════════
+   UI: SHOW/HIDE QUESTIONS LIST
+════════════════════════════════════════════════════════ */
+const tierMeta = {
+  newBorn:    { title:'New Born',    desc:'Foundation Archetypes. Master the basics of memory and logic.',    level:'01' },
+  youngBlood: { title:'Young Blood', desc:'Algorithmic Flux. Navigate the flow of complex data structures.', level:'02' },
+  master:     { title:'Master',      desc:'The Singularity. Solve the unsolvable and transcend the stack.',  level:'03' },
+};
+
+function showQuestions(tierKey) {
+  const meta = tierMeta[tierKey];
+  document.getElementById('qv-title').textContent = meta.title;
+  document.getElementById('qv-desc').textContent  = meta.desc;
+  const list = document.getElementById('qv-list');
+  list.innerHTML = '';
+
+  QUESTIONS[tierKey].forEach(q => {
+    const done = isCompleted(tierKey, q.id);
+    const el = document.createElement('div');
+    el.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:8px;background:#1c1b1b;border:1px solid rgba(63,72,80,0.22);cursor:pointer;transition:all 0.18s;';
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span class="material-symbols-outlined" style="color:${done?'#92ccff':'#3f4850'};font-size:20px!important">${done?'check_circle':'radio_button_unchecked'}</span>
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:0.02em;margin-bottom:2px;">Q${q.id}: ${q.title}</div>
+          <div style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;color:#9aa3ad;text-transform:uppercase;letter-spacing:0.07em;">${q.topic} · Level ${meta.level}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="padding:2px 10px;border-radius:100px;font-size:11px;font-weight:700;font-family:'Barlow',sans-serif;letter-spacing:0.04em;
+          ${q.diffClass==='easy'   ? 'background:rgba(196,201,200,0.1);color:#c3c7c8;border:1px solid rgba(196,201,200,0.18);'
+          : q.diffClass==='medium' ? 'background:rgba(146,204,255,0.08);color:#92ccff;border:1px solid rgba(146,204,255,0.18);'
+          :                          'background:rgba(234,179,8,0.08);color:#eab308;border:1px solid rgba(234,179,8,0.18);'}">
+          ${q.difficulty}
+        </span>
+        <span class="material-symbols-outlined" style="color:#3f4850;font-size:18px!important">chevron_right</span>
+      </div>`;
+    el.addEventListener('mouseover', () => { el.style.borderColor='rgba(146,204,255,0.25)'; el.style.background='#201f1f'; });
+    el.addEventListener('mouseout',  () => { el.style.borderColor='rgba(63,72,80,0.22)';   el.style.background='#1c1b1b'; });
+    el.addEventListener('click',     () => openWorkspace(q, tierKey));
+    list.appendChild(el);
+  });
+
+  document.getElementById('tier-selection').classList.add('hidden');
+  document.getElementById('questions-view').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideQuestions() {
+  document.getElementById('questions-view').classList.add('hidden');
+  document.getElementById('tier-selection').classList.remove('hidden');
+}
+
+/* ════════════════════════════════════════════════════════
+   WORKSPACE
+════════════════════════════════════════════════════════ */
 let editor;
 let leftTabs, bottomTabs;
+let currentQuestion = null;
+let currentTierKey  = null;
+let currentCaseIdx  = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
   editor = ace.edit('code-editor');
@@ -435,6 +1501,54 @@ document.addEventListener('DOMContentLoaded', () => {
     useWorker: false,
   });
   window._aceEditor = editor;
+});
+
+function openWorkspace(q, tierKey) {
+  currentQuestion = q;
+  currentTierKey  = tierKey;
+  currentCaseIdx  = 0;
+
+  // Build description HTML
+  let descHTML = `<h1>${q.id}. ${q.title}</h1>
+  <div class="badge-row">
+    <span class="badge ${q.diffClass}">${q.difficulty}</span>
+    <span class="badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">sell</span> ${q.topic}</span>
+  </div>
+  ${q.description}`;
+
+  q.examples.forEach((ex, i) => {
+    descHTML += `<div class="section-title">Example ${i+1}</div>
+    <div class="code-block">
+      <span class="label">Input:</span> ${esc(ex.input)}<br>
+      <span class="label">Output:</span> ${esc(ex.output)}
+      ${ex.explanation ? `<br><span class="label">Explanation:</span> ${esc(ex.explanation)}` : ''}
+    </div>`;
+  });
+
+  if (q.constraints.length) {
+    descHTML += `<div class="section-title">Constraints</div>
+    <ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;font-family:var(--font-body);">
+      ${q.constraints.map(c => `<li><code>${c}</code></li>`).join('')}
+    </ul>`;
+  }
+
+  document.getElementById('ws-desc-body').innerHTML = descHTML;
+
+  // Set starter code
+  editor.setValue(q.starterCode.cpp, -1);
+
+  // Build test case tabs
+  buildCaseTabs(q);
+
+  // Show workspace
+  document.getElementById('main-app-container').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  app.style.flexDirection = 'column';
+  document.body.classList.add('workspace-active');
+
+  leftTabs   = SplitLayout.initTabs(document.getElementById('panel-left'),    'description');
+  bottomTabs = SplitLayout.initTabs(document.getElementById('bottom-section'), 'testcase');
 
   SplitLayout.initVerticalDivider(
     document.getElementById('divider-v'),
@@ -448,104 +1562,199 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('panel-right')
   );
 
-  leftTabs   = SplitLayout.initTabs(document.getElementById('panel-left'),   'description');
-  bottomTabs = SplitLayout.initTabs(document.getElementById('bottom-section'), 'testcase');
-});
-
-function selectCase(btn) {
-  document.querySelectorAll('.case-tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-/* ── Data ── */
-const questionsData = {
-  newBorn:    { title:'New Born',    desc:'Foundation Archetypes. Master the basics of memory and logic.',    count:15, level:'01', diffText:'Easy',   diffClass:'easy'   },
-  youngBlood: { title:'Young Blood', desc:'Algorithmic Flux. Navigate the flow of complex data structures.', count:10, level:'02', diffText:'Medium', diffClass:'medium' },
-  master:     { title:'Master',      desc:'The Singularity. Solve the unsolvable and transcend the stack.',  count:5,  level:'03', diffText:'Hard',   diffClass:'hard'   },
-};
-const topics = ['Arrays','Strings','Linked Lists','Trees','Graphs','Dynamic Programming','Math','Bit Manipulation'];
-
-function showQuestions(tierKey) {
-  const tier = questionsData[tierKey];
-  document.getElementById('qv-title').textContent = tier.title;
-  document.getElementById('qv-desc').textContent  = tier.desc;
-  const list = document.getElementById('qv-list');
-  list.innerHTML = '';
-  for (let i = 1; i <= tier.count; i++) {
-    const topic = topics[Math.floor(Math.random() * topics.length)];
-    const done  = Math.random() > 0.8;
-    const el = document.createElement('div');
-    el.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-radius:8px;background:#1c1b1b;border:1px solid rgba(63,72,80,0.22);cursor:pointer;transition:all 0.18s;';
-    el.innerHTML = `
-      <div style="display:flex;align-items:center;gap:14px;">
-        <span class="material-symbols-outlined" style="color:${done?'#92ccff':'#3f4850'};font-size:20px!important">${done?'check_circle':'radio_button_unchecked'}</span>
-        <div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;letter-spacing:0.02em;margin-bottom:2px;">Q${i}: The Mystery of ${topic}</div>
-          <div style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;color:#9aa3ad;text-transform:uppercase;letter-spacing:0.07em;">${topic} · Level ${tier.level}</div>
-        </div>
-      </div>
-      <span class="material-symbols-outlined" style="color:#3f4850;font-size:18px!important">chevron_right</span>`;
-    el.addEventListener('mouseover', () => { el.style.borderColor='rgba(146,204,255,0.25)'; el.style.background='#201f1f'; });
-    el.addEventListener('mouseout',  () => { el.style.borderColor='rgba(63,72,80,0.22)';   el.style.background='#1c1b1b'; });
-    el.addEventListener('click',     () => openWorkspace(i, topic, tierKey));
-    list.appendChild(el);
-  }
-  document.getElementById('tier-selection').classList.add('hidden');
-  document.getElementById('questions-view').classList.remove('hidden');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function hideQuestions() {
-  document.getElementById('questions-view').classList.add('hidden');
-  document.getElementById('tier-selection').classList.remove('hidden');
-}
-
-function openWorkspace(id, topic, tierKey) {
-  const tier = questionsData[tierKey];
-  document.getElementById('ws-title').textContent = id + '. The Mystery of ' + topic;
-  const diffEl = document.getElementById('ws-diff');
-  diffEl.className = 'badge ' + tier.diffClass;
-  diffEl.textContent = tier.diffText;
-
-  document.getElementById('main-app-container').style.display = 'none';
-  const app = document.getElementById('app');
-  app.style.display = 'flex';
-  app.style.flexDirection = 'column';
-  document.body.classList.add('workspace-active');
-
-  leftTabs   = SplitLayout.initTabs(document.getElementById('panel-left'),    'description');
-  bottomTabs = SplitLayout.initTabs(document.getElementById('bottom-section'), 'testcase');
+  document.getElementById('test-result-output').innerHTML =
+    '<span class="placeholder">Run your code to see results here.</span>';
 
   setTimeout(() => { if (editor) editor.resize(); }, 60);
+}
+
+function buildCaseTabs(q) {
+  const tabRow = document.getElementById('case-tabs-row');
+  tabRow.innerHTML = '';
+  q.testCases.forEach((tc, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'case-tab' + (i === 0 ? ' active' : '');
+    btn.textContent = tc.label;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.case-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCaseIdx = i;
+      renderCaseDisplay(q.testCases[i]);
+    });
+    tabRow.appendChild(btn);
+  });
+  renderCaseDisplay(q.testCases[0]);
+}
+
+function renderCaseDisplay(tc) {
+  const el = document.getElementById('case-display');
+  el.innerHTML = tc.vars.map(v =>
+    `<div class="var-label">${v.name} =</div><div class="var-value">${v.value}</div>`
+  ).join('');
 }
 
 function closeWorkspace() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('main-app-container').style.display = 'block';
   document.body.classList.remove('workspace-active');
+  showQuestions(currentTierKey); // go back to the question list
 }
 
+function resetCode() {
+  if (currentQuestion) editor.setValue(currentQuestion.starterCode.cpp, -1);
+}
+
+/* ════════════════════════════════════════════════════════
+   RUN CODE — calls /api/run, compares against test cases
+════════════════════════════════════════════════════════ */
 async function runCode() {
-  const code  = editor.getValue();
-  const input = document.getElementById('input-box')?.value || '';
+  const code = editor.getValue();
+  const q    = currentQuestion;
 
   bottomTabs.activate('test-result');
-  document.getElementById('test-result-output').innerHTML =
-    '<span style="color:#9aa3ad;opacity:0.6">Running…</span>';
+  const outEl = document.getElementById('test-result-output');
+  outEl.innerHTML = '<span style="color:#9aa3ad;opacity:0.6;font-family:var(--font-body);">Running test cases…</span>';
+
+  document.getElementById('run-btn').disabled = true;
 
   try {
-    const res  = await fetch('/api/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, input }),
-    });
+    // Run against each test case
+    const results = await Promise.all(q.testCases.map(async tc => {
+      try {
+        const res  = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, input: tc.stdin }),
+        });
+        const data = await res.json();
+        if (!data.success) return { tc, status: 'err', actual: data.output };
+        const actual   = (data.output || '').trim();
+        const expected = tc.expectedOutput.trim();
+        return { tc, status: actual === expected ? 'pass' : 'fail', actual, expected };
+      } catch (e) {
+        return { tc, status: 'err', actual: e.message };
+      }
+    }));
+
+    renderResults(results, outEl);
+  } finally {
+    document.getElementById('run-btn').disabled = false;
+  }
+}
+
+async function submitCode() {
+  // Submit runs all cases and marks complete if all pass
+  const code = editor.getValue();
+  const q    = currentQuestion;
+
+  bottomTabs.activate('test-result');
+  const outEl = document.getElementById('test-result-output');
+  outEl.innerHTML = '<span style="color:#9aa3ad;opacity:0.6;font-family:var(--font-body);">Judging submission…</span>';
+
+  document.getElementById('submit-btn').disabled = true;
+
+  try {
+    const results = await Promise.all(q.testCases.map(async tc => {
+      try {
+        const res  = await fetch('/api/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, input: tc.stdin }),
+        });
+        const data = await res.json();
+        if (!data.success) return { tc, status: 'err', actual: data.output };
+        const actual   = (data.output || '').trim();
+        const expected = tc.expectedOutput.trim();
+        return { tc, status: actual === expected ? 'pass' : 'fail', actual, expected };
+      } catch (e) {
+        return { tc, status: 'err', actual: e.message };
+      }
+    }));
+
+    const allPass = results.every(r => r.status === 'pass');
+    if (allPass) {
+      markCompleted(currentTierKey, q.id);
+      // Refresh question list later
+    }
+    renderResults(results, outEl, true);
+  } finally {
+    document.getElementById('submit-btn').disabled = false;
+  }
+}
+
+function renderResults(results, outEl, isSubmit = false) {
+  const total   = results.length;
+  const passed  = results.filter(r => r.status === 'pass').length;
+  const hasErr  = results.some(r => r.status === 'err');
+  const allPass = passed === total && !hasErr;
+
+  let html = '';
+
+  if (isSubmit) {
+    if (allPass) {
+      html += `<div class="result-summary all-pass">
+        <span class="material-symbols-outlined" style="font-size:18px!important">check_circle</span>
+        Accepted — ${passed}/${total} test cases passed!
+      </div>`;
+    } else if (hasErr) {
+      html += `<div class="result-summary compile-err">
+        <span class="material-symbols-outlined" style="font-size:18px!important">error</span>
+        Compile / Runtime Error
+      </div>`;
+    } else {
+      html += `<div class="result-summary some-fail">
+        <span class="material-symbols-outlined" style="font-size:18px!important">cancel</span>
+        Wrong Answer — ${passed}/${total} test cases passed
+      </div>`;
+    }
+  } else {
+    html += `<div style="font-family:var(--font-body);font-size:12px;color:var(--on-surface-var);margin-bottom:10px;padding:6px 0;">
+      ${passed}/${total} test case${total>1?'s':''} passed
+    </div>`;
+  }
+
+  results.forEach((r, i) => {
+    const statusClass = r.status === 'pass' ? 'pass' : r.status === 'fail' ? 'fail' : 'err';
+    const icon  = r.status === 'pass' ? '✓' : r.status === 'fail' ? '✗' : '⚠';
+    const color = r.status === 'pass' ? 'var(--green)' : r.status === 'fail' ? 'var(--red)' : 'var(--yellow)';
+    const label = r.status === 'pass' ? 'Passed' : r.status === 'fail' ? 'Wrong Answer' : 'Error';
+
+    html += `<div class="tc-card">
+      <div class="tc-header ${statusClass}" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span style="color:${color};font-weight:800;font-family:var(--font-mono)">${icon}</span>
+        <span style="color:${color}">${r.tc.label}</span>
+        <span style="color:var(--on-surface-var);font-weight:500;margin-left:4px">— ${label}</span>
+        <span style="margin-left:auto;color:var(--on-surface-var);font-size:10px">▼ details</span>
+      </div>
+      <div class="tc-body ${i === 0 ? 'open' : ''}">
+        <div class="tc-row-label">Input (stdin)</div>
+        <div class="tc-row-val">${esc(r.tc.stdin)}</div>
+        <div class="tc-row-label">Expected Output</div>
+        <div class="tc-row-val" style="color:var(--green)">${esc(r.tc.expectedOutput || '(empty)')}</div>
+        ${r.status !== 'pass' ? `
+        <div class="tc-row-label">Your Output</div>
+        <div class="tc-row-val" style="color:${color}">${esc(r.actual || '(no output)')}</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  outEl.innerHTML = html;
+}
+
+async function runCustom() {
+  const code  = editor.getValue();
+  const input = document.getElementById('input-box')?.value || '';
+  bottomTabs.activate('test-result');
+  const outEl = document.getElementById('test-result-output');
+  outEl.innerHTML = '<span style="opacity:0.5;font-family:var(--font-body)">Running custom input…</span>';
+  try {
+    const res  = await fetch('/api/run', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({code, input}) });
     const data = await res.json();
-    document.getElementById('test-result-output').innerHTML = data.success
+    outEl.innerHTML = data.success
       ? `<pre class="out-success">${esc(data.output || '(no output)')}</pre>`
       : `<pre class="out-error">${esc(data.output)}</pre>`;
   } catch (e) {
-    document.getElementById('test-result-output').innerHTML =
-      `<pre class="out-error">Network error: ${esc(e.message)}</pre>`;
+    outEl.innerHTML = `<pre class="out-error">Network error: ${esc(e.message)}</pre>`;
   }
 }
 
