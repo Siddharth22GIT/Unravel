@@ -2,7 +2,7 @@
 // PASTE THIS INTO YOUR EXISTING server.js
 // =============================================
 // Required installs (run in /src):
-// npm install express mongoose bcryptjs cors
+// npm install express mongoose bcryptjs cors axios
 
 require('dotenv').config();
 
@@ -12,6 +12,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
+const axios = require('axios');
+const { exec } = require('child_process');
+const fs = require('fs');
+const { promisify } = require('util');
+const crypto = require('crypto');
 
 const app = express();
 // require('dotenv').config();
@@ -136,17 +141,14 @@ app.post('/api/analyze', (req, res) => {
                 currentDepth = Math.max(0, currentDepth - 1);
             }
 
-            
-
-          
             // RECURSION DETECTION (BETTER)
-if (functionName) {
-    const callPattern = new RegExp(`\\b${functionName}\\s*\\(`);
+            if (functionName) {
+                const callPattern = new RegExp(`\\b${functionName}\\s*\\(`);
 
-    if (callPattern.test(line) && !line.match(/(int|void|float|double|string)\s+\w+\s*\(/)) {
-        hasRecursion = true;
-    }
-}
+                if (callPattern.test(line) && !line.match(/(int|void|float|double|string)\s+\w+\s*\(/)) {
+                    hasRecursion = true;
+                }
+            }
         }
 
         // ---- DECISION LOGIC ----
@@ -197,69 +199,204 @@ Explanation: ${explanation}
 });
 
 // ---- RUN C++ CODE ROUTE ----
-const { exec } = require("child_process");
-const fs = require("fs");
+const execAsync = promisify(exec);
+const JUDGE0_BASE_URL = 'https://ce.judge0.com';
+const CPP_LANGUAGE_ID = 54;
+const EXECUTION_TIMEOUT_MS = 3000;
+const CLEANUP_DELAY_MS = 1000;
+const JUDGE0_POLL_DELAY_MS = 1000;
+const JUDGE0_MAX_POLLS = 10;
+const RUN_LOG_WINDOW_MS = 2000;
+const recentRunLogs = new Map();
 
-app.post("/api/run", (req, res) => {
-    const { code, input } = req.body;
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    const uniqueId = Date.now();
+function encodeBase64(value = '') {
+    return Buffer.from(String(value), 'utf8').toString('base64');
+}
 
+function decodeBase64(value) {
+    if (!value) return '';
+
+    try {
+        return Buffer.from(value, 'base64').toString('utf8');
+    } catch (err) {
+        return value;
+    }
+}
+
+function shouldLogRunBurst(code, mode) {
+    const codeHash = crypto.createHash('sha1').update(String(code || '')).digest('hex');
+    const key = `${mode}:${codeHash}`;
+    const now = Date.now();
+    const lastSeen = recentRunLogs.get(key) || 0;
+
+    recentRunLogs.set(key, now);
+
+    for (const [entryKey, timestamp] of recentRunLogs.entries()) {
+        if (now - timestamp > RUN_LOG_WINDOW_MS) {
+            recentRunLogs.delete(entryKey);
+        }
+    }
+
+    return now - lastSeen > RUN_LOG_WINDOW_MS;
+}
+
+function scheduleCleanup(filePath, exePath) {
+    setTimeout(() => {
+        try {
+            if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+            if (fs.existsSync(exePath)) fs.unlinkSync(exePath);
+        } catch (err) {
+            console.log('Cleanup error:', err.message);
+        }
+    }, CLEANUP_DELAY_MS);
+}
+
+async function runWithJudge0(code, input = '') {
+    try {
+        const submitResponse = await axios.post(
+            `${JUDGE0_BASE_URL}/submissions?base64_encoded=true`,
+            {
+                source_code: encodeBase64(code),
+                stdin: encodeBase64(input),
+                language_id: CPP_LANGUAGE_ID
+            },
+            {
+                headers: { 'Content-Type': 'application/json' },
+                timeout: 10000
+            }
+        );
+
+        const token = submitResponse.data?.token;
+
+        if (!token) {
+            return {
+                success: false,
+                output: 'Judge0 did not return a submission token.'
+            };
+        }
+
+        for (let attempt = 0; attempt < JUDGE0_MAX_POLLS; attempt++) {
+            const resultResponse = await axios.get(
+                `${JUDGE0_BASE_URL}/submissions/${token}?base64_encoded=true`,
+                { timeout: 10000 }
+            );
+
+            const result = resultResponse.data;
+            const statusId = result?.status?.id;
+
+            if (statusId >= 3) {
+                const output =
+                    decodeBase64(result.stdout) ||
+                    decodeBase64(result.stderr) ||
+                    decodeBase64(result.compile_output) ||
+                    result.message ||
+                    'No output received.';
+
+                return {
+                    success: statusId === 3,
+                    output
+                };
+            }
+
+            await wait(JUDGE0_POLL_DELAY_MS);
+        }
+
+        return {
+            success: false,
+            output: 'Judge0 execution timed out while waiting for the result.'
+        };
+    } catch (err) {
+        return {
+            success: false,
+            output:
+                err.response?.data?.error ||
+                err.response?.data?.message ||
+                'Failed to execute code via Judge0.'
+        };
+    }
+}
+
+async function runLocally(code, input = '') {
+    const uniqueId = `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
     const filePath = path.join(__dirname, `temp_${uniqueId}.cpp`);
     const exePath = path.join(__dirname, `temp_${uniqueId}.exe`);
 
-    fs.writeFileSync(filePath, code);
+    try {
+        fs.writeFileSync(filePath, code);
 
-    // Step 1: Compile
-    exec(`g++ "${filePath}" -o "${exePath}"`, (compileErr, _, compileStderr) => {
+        await execAsync(`g++ "${filePath}" -o "${exePath}"`);
 
-        if (compileErr) {
-            return res.json({
-                success: false,
-                type: "compile",
-                output: compileStderr
-            });
-        }
+        return await new Promise((resolve) => {
+            const runProcess = exec(
+                `"${exePath}"`,
+                { timeout: EXECUTION_TIMEOUT_MS },
+                (runErr, stdout, stderr) => {
+                    if (runErr) {
+                        if (runErr.killed || runErr.signal === 'SIGTERM') {
+                            return resolve({
+                                success: false,
+                                output: 'Execution timed out (possible infinite loop).'
+                            });
+                        }
 
-        // Step 2: Run WITH TIMEOUT
-        const runProcess = exec(exePath, { timeout: 3000 }, (runErr, stdout, stderr) => {
+                        return resolve({
+                            success: false,
+                            output: stderr || runErr.message || 'Runtime error occurred.'
+                        });
+                    }
 
-            if (runErr) {
-                if (runErr.killed) {
-                    return res.json({
-                        success: false,
-                        output: "Execution timed out (possible infinite loop)"
+                    resolve({
+                        success: true,
+                        output: stdout || ''
                     });
                 }
+            );
 
-                return res.json({
-                    success: false,
-                    type: "runtime",
-                    output: stderr
-                });
-            }
-
-            res.json({
-                success: true,
-                output: stdout
-            });
-
-            // ✅ DELAYED CLEANUP (FIXES EPERM)
-            setTimeout(() => {
-                try {
-                    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-                    if (fs.existsSync(exePath)) fs.unlinkSync(exePath);
-                } catch (err) {
-                    console.log("Cleanup error:", err.message);
-                }
-            }, 1000);
-        });
-
-        // ✅ FIX INPUT (IMPORTANT)
-        if (input) {
-            runProcess.stdin.write(input + "\n");
+            runProcess.stdin.write(`${input || ''}\n`);
             runProcess.stdin.end();
-        }
-    });
+        });
+    } catch (err) {
+        return {
+            success: false,
+            output: err.stderr || err.message || 'Compilation failed.'
+        };
+    } finally {
+        scheduleCleanup(filePath, exePath);
+    }
+}
+
+app.post('/api/run', async (req, res) => {
+    const { code, input } = req.body;
+    const executionMode = process.env.NODE_ENV === 'production' ? 'Judge0' : 'local g++';
+
+    if (shouldLogRunBurst(code, executionMode)) {
+        console.log(`[RUN] Incoming /api/run request. NODE_ENV=${process.env.NODE_ENV || 'undefined'} -> ${executionMode}`);
+    }
+
+    if (!code) {
+        return res.status(400).json({
+            success: false,
+            output: 'No code provided.'
+        });
+    }
+
+    try {
+        const result =
+            process.env.NODE_ENV === 'production'
+                ? await runWithJudge0(code, input)
+                : await runLocally(code, input);
+
+        return res.json(result);
+    } catch (err) {
+        console.error('Run route error:', err);
+
+        return res.status(500).json({
+            success: false,
+            output: 'Server failed to execute the code.'
+        });
+    }
 });
+
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
