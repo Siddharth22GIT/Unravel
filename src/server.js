@@ -47,6 +47,58 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
+const submissionEntrySchema = new mongoose.Schema({
+    code: { type: String, default: '' },
+    results: { type: Array, default: [] },
+    allPass: { type: Boolean, default: false },
+    passed: { type: Number, default: 0 },
+    total: { type: Number, default: 0 },
+    time: { type: String, default: '' },
+    timestamp: { type: Date, default: Date.now }
+}, { _id: false });
+
+const analysisEntrySchema = new mongoose.Schema({
+    code: { type: String, default: '' },
+    timeComplexity: { type: String, default: '' },
+    spaceComplexity: { type: String, default: '' },
+    explanation: { type: String, default: '' },
+    time: { type: String, default: '' },
+    timestamp: { type: Date, default: Date.now }
+}, { _id: false });
+
+const workspaceStateSchema = new mongoose.Schema({
+    userEmail: { type: String, required: true },
+    questionKey: { type: String, required: true },
+    questionId: { type: Number, required: true },
+    tierKey: { type: String, required: true },
+    savedCode: { type: String, default: '' },
+    submissionHistory: { type: [submissionEntrySchema], default: [] },
+    analysisHistory: { type: [analysisEntrySchema], default: [] }
+}, {
+    timestamps: true
+});
+
+workspaceStateSchema.index({ userEmail: 1, questionKey: 1 }, { unique: true });
+
+const WorkspaceState = mongoose.model('WorkspaceState', workspaceStateSchema);
+
+function buildQuestionKey(questionId, tierKey) {
+    return `${tierKey}_${questionId}`;
+}
+
+function normalizeWorkspaceState(state) {
+    return {
+        savedCode: state?.savedCode || '',
+        submissionHistory: state?.submissionHistory || [],
+        analysisHistory: state?.analysisHistory || []
+    };
+}
+
+async function validateWorkspaceUser(email) {
+    if (!email) return null;
+    return User.findOne({ email });
+}
+
 // ---- SIGNUP Route ----
 app.post('/api/auth/signup', async (req, res) => {
     const { name, email, password } = req.body;
@@ -195,6 +247,140 @@ Explanation: ${explanation}
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Analysis failed" });
+    }
+});
+
+app.get('/api/workspace/state', async (req, res) => {
+    const { email, questionId, tierKey } = req.query;
+
+    if (!email || !questionId || !tierKey) {
+        return res.status(400).json({ message: 'email, questionId, and tierKey are required' });
+    }
+
+    try {
+        const user = await validateWorkspaceUser(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const questionKey = buildQuestionKey(questionId, tierKey);
+        const state = await WorkspaceState.findOne({ userEmail: email, questionKey }).lean();
+
+        return res.json({
+            success: true,
+            state: normalizeWorkspaceState(state)
+        });
+    } catch (err) {
+        console.error('Workspace load error:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to load workspace state'
+        });
+    }
+});
+
+app.post('/api/workspace/state/submission', async (req, res) => {
+    const { email, questionId, tierKey, code, entry } = req.body;
+
+    if (!email || !questionId || !tierKey || !entry) {
+        return res.status(400).json({ message: 'email, questionId, tierKey, and entry are required' });
+    }
+
+    try {
+        const user = await validateWorkspaceUser(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const questionKey = buildQuestionKey(questionId, tierKey);
+
+        await WorkspaceState.findOneAndUpdate(
+            { userEmail: email, questionKey },
+            {
+                $set: {
+                    questionId,
+                    tierKey,
+                    savedCode: code || '',
+                    updatedAt: new Date()
+                },
+                $push: {
+                    submissionHistory: {
+                        $each: [{
+                            code: entry.code || code || '',
+                            results: entry.results || [],
+                            allPass: Boolean(entry.allPass),
+                            passed: entry.passed || 0,
+                            total: entry.total || 0,
+                            time: entry.time || '',
+                            timestamp: entry.timestamp || new Date()
+                        }],
+                        $position: 0,
+                        $slice: 50
+                    }
+                }
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
+        return res.json({ success: true });
+    } catch (err) {
+        console.error('Workspace submission save error:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to save submission history'
+        });
+    }
+});
+
+app.post('/api/workspace/state/analysis', async (req, res) => {
+    const { email, questionId, tierKey, code, entry } = req.body;
+
+    if (!email || !questionId || !tierKey || !entry) {
+        return res.status(400).json({ message: 'email, questionId, tierKey, and entry are required' });
+    }
+
+    try {
+        const user = await validateWorkspaceUser(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const questionKey = buildQuestionKey(questionId, tierKey);
+
+        await WorkspaceState.findOneAndUpdate(
+            { userEmail: email, questionKey },
+            {
+                $set: {
+                    questionId,
+                    tierKey,
+                    savedCode: code || '',
+                    updatedAt: new Date()
+                },
+                $push: {
+                    analysisHistory: {
+                        $each: [{
+                            code: entry.code || code || '',
+                            timeComplexity: entry.timeComplexity || '',
+                            spaceComplexity: entry.spaceComplexity || '',
+                            explanation: entry.explanation || '',
+                            time: entry.time || '',
+                            timestamp: entry.timestamp || new Date()
+                        }],
+                        $position: 0,
+                        $slice: 50
+                    }
+                }
+            },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
+        return res.json({ success: true });
+    } catch (err) {
+        console.error('Workspace analysis save error:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to save analysis history'
+        });
     }
 });
 

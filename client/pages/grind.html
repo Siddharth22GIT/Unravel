@@ -1527,8 +1527,9 @@ let currentTierKey  = null;
 let currentCaseIdx  = 0;
 let lastRunSuccess  = false;
 
-/* Per-question submission history stored in memory */
+/* Per-question account history stored in memory */
 let submissionHistory = {};
+let analysisHistory = {};
 
 document.addEventListener('DOMContentLoaded', () => {
   editor = ace.edit('code-editor');
@@ -1546,7 +1547,132 @@ document.addEventListener('DOMContentLoaded', () => {
   window._aceEditor = editor;
 });
 
-function openWorkspace(q, tierKey) {
+function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch (e) {
+    return null;
+  }
+}
+
+function getCurrentUserEmail() {
+  return getCurrentUser()?.email || null;
+}
+
+function getWorkspaceKey(question = currentQuestion, tier = currentTierKey) {
+  if (!question || !tier) return null;
+  return `${tier}_${question.id}`;
+}
+
+function resetComplexityPanel() {
+  document.getElementById('complexity-placeholder').style.display = 'flex';
+  document.getElementById('complexity-results').style.display = 'none';
+  document.getElementById('comp-time-value').textContent  = '—';
+  document.getElementById('comp-space-value').textContent = '—';
+  document.getElementById('comp-explanation').textContent = '—';
+}
+
+function showAnalysisEntry(entry) {
+  if (!entry) return;
+  document.getElementById('complexity-placeholder').style.display = 'none';
+  document.getElementById('complexity-results').style.display = 'block';
+  document.getElementById('comp-time-value').textContent  = entry.timeComplexity || 'N/A';
+  document.getElementById('comp-space-value').textContent = entry.spaceComplexity || 'N/A';
+  document.getElementById('comp-explanation').textContent = entry.explanation || '—';
+}
+
+function getSubmissionEntries(key = getWorkspaceKey()) {
+  return key ? (submissionHistory[key] || []) : [];
+}
+
+function getAnalysisEntries(key = getWorkspaceKey()) {
+  return key ? (analysisHistory[key] || []) : [];
+}
+
+function getCombinedHistoryEntries(key = getWorkspaceKey()) {
+  return [
+    ...getSubmissionEntries(key).map((entry, idx) => ({ ...entry, entryType: 'submission', idx })),
+    ...getAnalysisEntries(key).map((entry, idx) => ({ ...entry, entryType: 'analysis', idx })),
+  ].sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+}
+
+async function loadWorkspaceState() {
+  const email = getCurrentUserEmail();
+  const key = getWorkspaceKey();
+
+  if (!email || !key) return;
+
+  try {
+    const params = new URLSearchParams({
+      email,
+      questionId: String(currentQuestion.id),
+      tierKey: currentTierKey,
+    });
+    const res = await fetch(`/api/workspace/state?${params.toString()}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.success) return;
+
+    submissionHistory[key] = data.state?.submissionHistory || [];
+    analysisHistory[key] = data.state?.analysisHistory || [];
+
+    editor.setValue(data.state?.savedCode || currentQuestion.starterCode.cpp, -1);
+    renderHistoryPanel();
+
+    const latestAnalysis = getAnalysisEntries(key)[0];
+    if (latestAnalysis) {
+      showAnalysisEntry(latestAnalysis);
+    } else {
+      resetComplexityPanel();
+    }
+  } catch (e) {
+    console.error('Failed to load workspace state:', e);
+  }
+}
+
+async function saveSubmissionToServer(entry) {
+  const email = getCurrentUserEmail();
+  if (!email || !currentQuestion) return;
+
+  try {
+    await fetch('/api/workspace/state/submission', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        questionId: currentQuestion.id,
+        tierKey: currentTierKey,
+        code: editor.getValue(),
+        entry,
+      }),
+    });
+  } catch (e) {
+    console.error('Failed to save submission history:', e);
+  }
+}
+
+async function saveAnalysisToServer(entry) {
+  const email = getCurrentUserEmail();
+  if (!email || !currentQuestion) return;
+
+  try {
+    await fetch('/api/workspace/state/analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        questionId: currentQuestion.id,
+        tierKey: currentTierKey,
+        code: editor.getValue(),
+        entry,
+      }),
+    });
+  } catch (e) {
+    console.error('Failed to save analysis history:', e);
+  }
+}
+
+async function openWorkspace(q, tierKey) {
   currentQuestion = q;
   currentTierKey  = tierKey;
   currentCaseIdx  = 0;
@@ -1582,6 +1708,10 @@ function openWorkspace(q, tierKey) {
   }
   document.getElementById('ws-desc-body').innerHTML = descHTML;
 
+  const key = getWorkspaceKey(q, tierKey);
+  if (!submissionHistory[key]) submissionHistory[key] = [];
+  if (!analysisHistory[key]) analysisHistory[key] = [];
+
   editor.setValue(q.starterCode.cpp, -1);
   buildCaseTabs(q);
   renderHistoryPanel();
@@ -1610,6 +1740,7 @@ function openWorkspace(q, tierKey) {
   document.getElementById('test-result-output').innerHTML =
     '<span class="placeholder">Run your code to see results here.</span>';
 
+  await loadWorkspaceState();
   setTimeout(() => { if (editor) editor.resize(); }, 60);
 }
 
@@ -1698,6 +1829,84 @@ function restoreSubmission(idx) {
   renderResults(entry.results, document.getElementById('test-result-output'), true);
 }
 
+function addToHistory(entry) {
+  const key = getWorkspaceKey();
+  if (!key) return;
+  if (!submissionHistory[key]) submissionHistory[key] = [];
+  submissionHistory[key].unshift(entry);
+  renderHistoryPanel();
+}
+
+function addAnalysisHistory(entry) {
+  const key = getWorkspaceKey();
+  if (!key) return;
+  if (!analysisHistory[key]) analysisHistory[key] = [];
+  analysisHistory[key].unshift(entry);
+  renderHistoryPanel();
+}
+
+function renderHistoryPanel() {
+  const entries = getCombinedHistoryEntries();
+  const listEl = document.getElementById('ws-history-list');
+  const badge  = document.getElementById('ws-history-count');
+
+  badge.textContent = entries.length;
+  badge.style.display = entries.length > 0 ? 'inline-flex' : 'none';
+
+  if (entries.length === 0) {
+    listEl.innerHTML = `<div class="history-empty">
+      <span class="material-symbols-outlined mat-icon-large">history_toggle_off</span>
+      <p>No saved history yet.<br/>Use <strong style="color:#ffcb30">Submit</strong> or <strong style="color:#4ec9b0">Analyze</strong> to save progress.</p>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = entries.map((e, i) => {
+    if (e.entryType === 'analysis') {
+      return `<div class="history-item" onclick="restoreHistoryEntry(${i})">
+        <div class="history-item-top">
+          <div class="history-item-title">Complexity Analysis</div>
+          <div class="history-item-time">${e.time || new Date(e.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
+        </div>
+        <div class="history-item-chips">
+          <span class="history-chip chip-score">${esc(e.timeComplexity || 'N/A')}</span>
+          <span class="history-chip chip-score">${esc(e.spaceComplexity || 'N/A')}</span>
+        </div>
+      </div>`;
+    }
+
+    const statusChip = e.allPass
+      ? `<span class="history-chip chip-pass">Accepted</span>`
+      : `<span class="history-chip chip-fail">Wrong Answer</span>`;
+    const scoreChip = `<span class="history-chip chip-score">${e.passed}/${e.total} passed</span>`;
+    return `<div class="history-item" onclick="restoreHistoryEntry(${i})">
+      <div class="history-item-top">
+        <div class="history-item-title">${e.allPass ? '✓' : '✗'} Submission</div>
+        <div class="history-item-time">${e.time}</div>
+      </div>
+      <div class="history-item-chips">${statusChip}${scoreChip}</div>
+    </div>`;
+  }).join('');
+}
+
+function restoreHistoryEntry(idx) {
+  const entry = getCombinedHistoryEntries()[idx];
+  if (!entry) return;
+
+  if (entry.code) {
+    editor.setValue(entry.code, -1);
+  }
+
+  if (entry.entryType === 'analysis') {
+    showAnalysisEntry(entry);
+    leftTabs.activate('complexity');
+    return;
+  }
+
+  bottomTabs.activate('test-result');
+  renderResults(entry.results, document.getElementById('test-result-output'), true);
+}
+
 /* ════════════════════════════════════════════════════════
    RUN CODE
 ════════════════════════════════════════════════════════ */
@@ -1755,12 +1964,19 @@ async function submitCode() {
 
     if (allPass) markCompleted(currentTierKey, q.id);
 
-    // Save to history
     const now = new Date();
-    addToHistory({
-      results, allPass, passed, total: results.length,
+    const submissionEntry = {
+      code,
+      results,
+      allPass,
+      passed,
+      total: results.length,
       time: now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }),
-    });
+      timestamp: now.toISOString(),
+    };
+
+    addToHistory(submissionEntry);
+    await saveSubmissionToServer(submissionEntry);
 
     renderResults(results, outEl, true);
   } finally {
@@ -1807,9 +2023,18 @@ async function analyzeCode() {
     const spaceVal = data.spaceComplexity || extractBigO(resultText, 'space') || 'N/A';
     const expText  = data.explanation     || extractExplanation(resultText)   || resultText || '—';
 
-    document.getElementById('comp-time-value').textContent  = timeVal;
-    document.getElementById('comp-space-value').textContent = spaceVal;
-    document.getElementById('comp-explanation').textContent = expText;
+    const analysisEntry = {
+      code,
+      timeComplexity: timeVal,
+      spaceComplexity: spaceVal,
+      explanation: expText,
+      time: new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }),
+      timestamp: new Date().toISOString(),
+    };
+
+    showAnalysisEntry(analysisEntry);
+    addAnalysisHistory(analysisEntry);
+    await saveAnalysisToServer(analysisEntry);
 
   } catch (e) {
     document.getElementById('comp-explanation').textContent = 'Error: ' + e.message;
