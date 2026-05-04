@@ -8,6 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;1,600;1,700;1,800&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="./grind-styles/grind-core.css" rel="stylesheet"/>
+<link href="./grind-styles/grind-results.css" rel="stylesheet"/>
+<link href="./grind-styles/grind-insights.css" rel="stylesheet"/>
 <script id="tailwind-config">
   tailwind.config = {
     darkMode: "class",
@@ -53,359 +56,6 @@
     }
   }
 </script>
-<style>
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
-  }
-  .glass-card { background: rgba(53,53,52,0.6); backdrop-filter: blur(20px); }
-  .text-gradient-primary {
-    background: linear-gradient(135deg, #92CCFF 0%, #3498DB 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  #landing { min-height: max(884px, 100dvh); }
-
-  /* ── Workspace ── */
-  *, *::before, *::after { box-sizing: border-box; }
-  :root {
-    --bg: #131313; --surface-low: #1c1b1b; --surface-high: #2a2a2a;
-    --surface-highest: #353534; --outline: #3f4850; --primary: #92ccff;
-    --primary-dim: #3498db; --on-primary: #003351; --tertiary: #c3c7c8;
-    --on-surface: #e5e2e1; --on-surface-var: #9aa3ad; --teal: #4ec9b0;
-    /* ── VIVID result colors ── */
-    --green:  #22ff88;
-    --red:    #ff4d6d;
-    --yellow: #ffcb30;
-    --font-display: 'Barlow Condensed', sans-serif;
-    --font-body: 'Barlow', sans-serif;
-    --font-mono: 'JetBrains Mono', 'ui-monospace', monospace;
-    --nav-h: 48px; --r-panel: 7px;
-  }
-  html, body { margin:0; padding:0; width:100%; height:100%; overflow:auto; background:transparent; color:var(--on-surface); font-family:var(--font-body); }
-  body.workspace-active { overflow:hidden; background:var(--bg); }
-  ::-webkit-scrollbar { width:4px; height:4px; }
-  ::-webkit-scrollbar-track { background:transparent; }
-  ::-webkit-scrollbar-thumb { background:#2a3038; border-radius:4px; }
-  ::-webkit-scrollbar-thumb:hover { background:var(--outline); }
-
-  #app { display:flex; flex-direction:column; width:100vw; height:100vh; overflow:hidden; }
-  .ws-nav { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; height:var(--nav-h); padding:0 16px; background:var(--surface-low); border-bottom:1px solid rgba(63,72,80,0.4); flex-shrink:0; z-index:10; }
-  .nav-left { display:flex; align-items:center; gap:10px; }
-  .nav-center { display:flex; align-items:center; gap:10px; justify-content:center; }
-  .nav-right { display:flex; align-items:center; gap:20px; justify-content:flex-end; }
-  .nav-logo { font-family:var(--font-display); font-weight:800; font-size:19px; letter-spacing:0.06em; text-transform:uppercase; color:var(--on-surface); text-decoration:none; line-height:1; flex-shrink:0; transition:opacity 0.2s; }
-  .nav-logo:hover { opacity:0.7; }
-  .nav-sep { width:1px; height:16px; background:rgba(63,72,80,0.55); flex-shrink:0; }
-  .nav-back { display:flex; align-items:center; gap:5px; padding:5px 9px; border-radius:5px; border:none; background:transparent; cursor:pointer; color:var(--on-surface-var); font-family:var(--font-body); font-size:12px; font-weight:600; transition:color 0.15s, background 0.15s; }
-  .nav-back:hover { color:var(--on-surface); background:rgba(63,72,80,0.22); }
-  .nav-btn { display:flex; align-items:center; gap:6px; padding:6px 16px; border-radius:5px; border:none; cursor:pointer; font-family:var(--font-body); font-size:13px; font-weight:700; transition:all 0.15s; }
-  .nav-btn.ghost { background:rgba(63,72,80,0.32); color:var(--primary); border:1px solid rgba(146,204,255,0.14); }
-  .nav-btn.ghost:hover { background:rgba(146,204,255,0.1); border-color:rgba(146,204,255,0.28); }
-  .nav-btn.primary { background:var(--primary); color:var(--on-primary); box-shadow:0 0 12px rgba(146,204,255,0.2); }
-  .nav-btn.primary:hover { filter:brightness(1.08); box-shadow:0 0 18px rgba(146,204,255,0.33); }
-  .nav-btn.analyze-btn { background: linear-gradient(135deg, #4ec9b0, #2a9d8f); color:#001a16; box-shadow:0 0 12px rgba(78,201,176,0.3); }
-  .nav-btn.analyze-btn:hover { filter:brightness(1.1); box-shadow:0 0 20px rgba(78,201,176,0.5); }
-  .nav-btn:disabled { opacity:0.5; cursor:not-allowed; }
-  .nav-links { display:flex; align-items:center; gap:40px; }
-  .nav-link { font-family:var(--font-display); font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:0.1em; text-decoration:none; color:rgba(229,226,225,0.38); transition:color 0.2s; white-space:nowrap; }
-  .nav-link:hover { color:rgba(229,226,225,0.7); }
-  .nav-link.active { color:var(--primary); }
-  .avatar { width:29px; height:29px; border-radius:50%; overflow:hidden; border:1.5px solid rgba(63,72,80,0.45); flex-shrink:0; }
-  .avatar img { width:100%; height:100%; object-fit:cover; }
-  .icon-btn { background:none; border:none; cursor:pointer; color:var(--on-surface-var); display:flex; align-items:center; padding:5px; border-radius:5px; transition:color 0.15s, background 0.15s; }
-  .icon-btn:hover { color:var(--on-surface); background:rgba(63,72,80,0.28); }
-
-  .split-container { display:flex; flex:1; overflow:hidden; padding:7px; }
-  .panel { display:flex; flex-direction:column; overflow:hidden; background:var(--surface-low); border-radius:var(--r-panel); border:1px solid rgba(63,72,80,0.28); }
-  .panel-left { flex:0 0 auto; }
-  .panel-right { flex:1 1 0; min-width:0; }
-  .divider-v { width:6px; flex-shrink:0; cursor:col-resize; position:relative; margin:7px 3px; z-index:5; }
-  .divider-v::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:2px; height:30px; background:rgba(63,72,80,0.55); border-radius:2px; transition:all 0.18s; }
-  .divider-v:hover::after, .divider-v.dragging::after { background:var(--primary); height:46px; width:3px; box-shadow:0 0 8px rgba(146,204,255,0.38); }
-  .panel-tabs { display:flex; align-items:center; padding:0 6px; background:rgba(22,21,21,0.75); border-bottom:1px solid rgba(63,72,80,0.22); flex-shrink:0; overflow-x:auto; gap:2px; }
-  .panel-tabs::-webkit-scrollbar { height:0; }
-  .tab-btn { display:flex; align-items:center; gap:5px; padding:9px 13px 8px; background:none; border:none; border-bottom:2px solid transparent; cursor:pointer; font-family:var(--font-body); font-size:12px; font-weight:600; letter-spacing:0.02em; color:var(--on-surface-var); white-space:nowrap; transition:color 0.15s, border-color 0.15s; margin-bottom:-1px; }
-  .tab-btn:hover { color:var(--on-surface); }
-  .tab-btn.active { color:var(--primary); border-bottom-color:var(--primary); }
-  .tab-btn.active.teal { color:var(--teal); border-bottom-color:var(--teal); }
-  .tab-btn.active.complexity-tab { color:#4ec9b0; border-bottom-color:#4ec9b0; }
-  .tab-btn.active.history-tab { color:#ffcb30; border-bottom-color:#ffcb30; }
-  .panel-body { flex:1; overflow-y:auto; overflow-x:hidden; }
-  .right-split { display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
-  .editor-section { flex:1 1 auto; display:flex; flex-direction:column; overflow:hidden; min-height:80px; }
-  .divider-h { height:6px; flex-shrink:0; cursor:row-resize; position:relative; margin:3px 0; z-index:5; }
-  .divider-h::after { content:''; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); height:2px; width:30px; background:rgba(63,72,80,0.55); border-radius:2px; transition:all 0.18s; }
-  .divider-h:hover::after, .divider-h.dragging::after { background:var(--primary); width:46px; height:3px; box-shadow:0 0 8px rgba(146,204,255,0.38); }
-  .bottom-section { display:flex; flex-direction:column; overflow:hidden; flex-shrink:0; background:var(--surface-low); border-radius:var(--r-panel); border:1px solid rgba(63,72,80,0.28); }
-  .tab-panel { display:none; flex:1; overflow:auto; }
-  .tab-panel.active { display:flex; flex-direction:column; }
-  .editor-lang-bar { display:flex; align-items:center; justify-content:space-between; padding:5px 12px; border-bottom:1px solid rgba(63,72,80,0.16); flex-shrink:0; }
-  .lang-selector { display:flex; align-items:center; gap:6px; background:rgba(63,72,80,0.28); padding:4px 10px; border-radius:4px; border:none; cursor:pointer; color:var(--on-surface-var); font-family:var(--font-body); font-size:12px; font-weight:600; transition:all 0.15s; }
-  .lang-selector:hover { color:var(--on-surface); background:rgba(63,72,80,0.42); }
-  #ace-container { flex:1; position:relative; background:#1a1a1a; overflow:hidden; }
-  #code-editor { position:absolute; inset:0; font-size:14px; }
-  .output-area { flex:1; padding:12px 16px; font-family:var(--font-mono); font-size:12.5px; overflow:auto; color:var(--on-surface-var); line-height:1.6; }
-  .output-area .placeholder { font-style:italic; opacity:0.4; font-family:var(--font-body); }
-  .output-area pre { margin:0; white-space:pre-wrap; word-break:break-all; }
-  .out-success { color:var(--green); }
-  .out-error { color:var(--red); }
-  .stdin-area { flex:1; padding:10px 14px; background:transparent; color:var(--on-surface); font-family:var(--font-mono); font-size:13px; border:none; outline:none; resize:none; line-height:1.65; }
-  .stdin-area::placeholder { color:rgba(154,163,173,0.28); font-family:var(--font-body); }
-  .testcase-body { flex:1; padding:12px 16px; overflow:auto; }
-  .case-tabs { display:flex; gap:6px; margin-bottom:14px; }
-  .case-tab { padding:4px 14px; border-radius:5px; background:rgba(63,72,80,0.28); color:var(--on-surface); border:none; cursor:pointer; font-family:var(--font-body); font-size:12px; font-weight:600; transition:all 0.15s; }
-  .case-tab.active { background:rgba(146,204,255,0.13); color:var(--primary); }
-  .case-tab:hover { background:rgba(146,204,255,0.07); }
-  .var-label { font-family:var(--font-mono); font-size:11px; color:var(--on-surface-var); margin-bottom:5px; }
-  .var-value { background:rgba(63,72,80,0.18); border:1px solid rgba(63,72,80,0.18); border-radius:4px; padding:7px 11px; font-family:var(--font-mono); font-size:13px; margin-bottom:12px; color:var(--on-surface); }
-  .desc-body { padding:22px 22px 36px; line-height:1.7; }
-  .desc-body h1 { font-family:var(--font-display); font-size:24px; font-weight:700; letter-spacing:0.02em; margin:0 0 14px; color:var(--on-surface); }
-  .desc-body p { color:var(--on-surface-var); font-size:14px; margin-bottom:12px; }
-  .desc-body strong { color:var(--on-surface); }
-  .badge-row { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
-  .badge { padding:3px 11px; border-radius:100px; font-family:var(--font-body); font-size:11px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; }
-  .badge.easy { background:rgba(196,201,200,0.1); color:var(--tertiary); border:1px solid rgba(196,201,200,0.18); }
-  .badge.medium { background:rgba(146,204,255,0.08); color:var(--primary); border:1px solid rgba(146,204,255,0.18); }
-  .badge.hard { background:rgba(234,179,8,0.08); color:#eab308; border:1px solid rgba(234,179,8,0.18); }
-  .badge.tag { background:rgba(63,72,80,0.28); color:var(--on-surface-var); cursor:pointer; }
-  .badge.tag:hover { background:rgba(63,72,80,0.45); color:var(--on-surface); }
-  .code-block { background:rgba(63,72,80,0.16); border:1px solid rgba(63,72,80,0.16); border-radius:6px; padding:13px 15px; font-family:var(--font-mono); font-size:12.5px; color:var(--on-surface-var); margin:12px 0; line-height:1.75; }
-  .code-block .label { color:rgba(154,163,173,0.65); margin-right:6px; }
-  code { background:rgba(63,72,80,0.32); padding:2px 6px; border-radius:3px; font-family:var(--font-mono); font-size:0.88em; color:var(--on-surface); }
-  .section-title { font-family:var(--font-display); font-weight:700; font-size:14px; letter-spacing:0.06em; text-transform:uppercase; color:var(--on-surface); margin:22px 0 9px; }
-  #drag-overlay { display:none; position:fixed; inset:0; z-index:9999; }
-  #drag-overlay.col { cursor:col-resize; }
-  #drag-overlay.row { cursor:row-resize; }
-
-  /* ══════════════════════════════════
-     VIVID Test result cards
-  ══════════════════════════════════ */
-  .tc-card {
-    border-radius:8px;
-    border:1px solid rgba(63,72,80,0.3);
-    margin-bottom:10px;
-    overflow:hidden;
-    transition: border-color 0.2s;
-  }
-  .tc-header {
-    display:flex; align-items:center; gap:9px; padding:10px 16px;
-    font-family:var(--font-body); font-size:12.5px; font-weight:700;
-    cursor:pointer; transition:background 0.15s;
-    position: relative;
-  }
-  .tc-header::before {
-    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
-  }
-  .tc-header:hover { filter: brightness(1.1); }
-
-  /* PASS — vivid green */
-  .tc-header.pass {
-    background: rgba(34,255,136,0.08);
-    border-left: 3px solid var(--green);
-  }
-  .tc-card:has(.tc-header.pass) { border-color: rgba(34,255,136,0.25); }
-  .tc-header.pass .tc-status-icon { color: var(--green); filter: drop-shadow(0 0 6px var(--green)); }
-  .tc-header.pass .tc-label { color: var(--green); font-weight:800; }
-  .tc-header.pass .tc-sublabel { color: rgba(34,255,136,0.6); }
-
-  /* FAIL — vivid red */
-  .tc-header.fail {
-    background: rgba(255,77,109,0.08);
-    border-left: 3px solid var(--red);
-  }
-  .tc-card:has(.tc-header.fail) { border-color: rgba(255,77,109,0.28); }
-  .tc-header.fail .tc-status-icon { color: var(--red); filter: drop-shadow(0 0 6px var(--red)); }
-  .tc-header.fail .tc-label { color: var(--red); font-weight:800; }
-  .tc-header.fail .tc-sublabel { color: rgba(255,77,109,0.65); }
-
-  /* ERROR — vivid yellow */
-  .tc-header.err {
-    background: rgba(255,203,48,0.08);
-    border-left: 3px solid var(--yellow);
-  }
-  .tc-card:has(.tc-header.err) { border-color: rgba(255,203,48,0.28); }
-  .tc-header.err .tc-status-icon { color: var(--yellow); filter: drop-shadow(0 0 6px var(--yellow)); }
-  .tc-header.err .tc-label { color: var(--yellow); font-weight:800; }
-  .tc-header.err .tc-sublabel { color: rgba(255,203,48,0.65); }
-
-  .tc-toggle-arrow { margin-left:auto; color:var(--on-surface-var); font-size:10px; font-family:var(--font-body); opacity:0.55; transition: opacity 0.15s; }
-  .tc-header:hover .tc-toggle-arrow { opacity:0.9; }
-
-  .tc-body {
-    padding:12px 16px 14px;
-    background:rgba(14,14,14,0.6);
-    display:none;
-    font-family:var(--font-mono);
-    font-size:11.5px;
-    line-height:1.9;
-    border-top: 1px solid rgba(63,72,80,0.18);
-  }
-  .tc-body.open { display:block; }
-  .tc-row-label {
-    color:var(--on-surface-var); font-size:10px; font-weight:700;
-    letter-spacing:0.09em; text-transform:uppercase; margin-bottom:3px;
-    font-family: var(--font-body);
-  }
-  .tc-row-val { color:var(--on-surface); margin-bottom:10px; }
-  .tc-row-val.expected { color: var(--green); }
-  .tc-row-val.actual-fail { color: var(--red); }
-  .tc-row-val.actual-err { color: var(--yellow); }
-
-  /* Result summary banners */
-  .result-summary {
-    display:flex; align-items:center; gap:10px; padding:12px 16px;
-    font-family:var(--font-body); font-size:13px; font-weight:800;
-    border-radius:8px; margin-bottom:14px; letter-spacing:0.02em;
-    position: relative; overflow: hidden;
-  }
-  .result-summary::after {
-    content:''; position:absolute; inset:0; opacity:0.04;
-    background: radial-gradient(circle at 20% 50%, white, transparent 70%);
-    pointer-events: none;
-  }
-  .result-summary.all-pass {
-    background: rgba(34,255,136,0.1);
-    color: var(--green);
-    border: 1px solid rgba(34,255,136,0.35);
-    box-shadow: 0 0 20px rgba(34,255,136,0.12), inset 0 0 30px rgba(34,255,136,0.04);
-  }
-  .result-summary.some-fail {
-    background: rgba(255,77,109,0.1);
-    color: var(--red);
-    border: 1px solid rgba(255,77,109,0.35);
-    box-shadow: 0 0 20px rgba(255,77,109,0.12), inset 0 0 30px rgba(255,77,109,0.04);
-  }
-  .result-summary.compile-err {
-    background: rgba(255,203,48,0.1);
-    color: var(--yellow);
-    border: 1px solid rgba(255,203,48,0.35);
-    box-shadow: 0 0 20px rgba(255,203,48,0.12), inset 0 0 30px rgba(255,203,48,0.04);
-  }
-  .result-summary .material-symbols-outlined { font-size:18px!important; }
-
-  /* Pass score pill */
-  .score-pill {
-    margin-left: auto;
-    background: rgba(0,0,0,0.3);
-    padding: 3px 10px;
-    border-radius: 100px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-  }
-
-  /* ══════════════════════════════════
-     COMPLEXITY PANEL
-  ══════════════════════════════════ */
-  .complexity-body { padding:18px 20px 30px; }
-  .complexity-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px; text-align:center; }
-  .complexity-empty .mat-icon-large { font-size:38px!important; color:rgba(78,201,176,0.25); }
-  .complexity-empty p { font-size:13px; color:var(--on-surface-var); line-height:1.6; max-width:220px; margin:0; }
-
-  .complexity-card {
-    border-radius:9px; padding:16px 18px; margin-bottom:12px;
-    display:flex; align-items:center; justify-content:space-between;
-    border:1px solid;
-    position:relative; overflow:hidden;
-  }
-  .complexity-card::before {
-    content:''; position:absolute; inset:0; opacity:0.05;
-    background: radial-gradient(circle at 90% 50%, white, transparent 65%);
-    pointer-events:none;
-  }
-  .complexity-card.time {
-    background: rgba(146,204,255,0.07);
-    border-color: rgba(146,204,255,0.22);
-  }
-  .complexity-card.space {
-    background: rgba(196,201,200,0.07);
-    border-color: rgba(196,201,200,0.18);
-  }
-  .complexity-card .card-label {
-    font-family:var(--font-body); font-size:10px; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.09em; color:var(--on-surface-var);
-    margin-bottom:5px;
-  }
-  .complexity-card .card-value {
-    font-family:var(--font-display); font-size:26px; font-weight:800;
-    letter-spacing:0.01em;
-  }
-  .complexity-card.time .card-value { color:#92ccff; text-shadow:0 0 18px rgba(146,204,255,0.4); }
-  .complexity-card.space .card-value { color:#c3c7c8; text-shadow:0 0 18px rgba(196,201,200,0.3); }
-  .complexity-card .card-icon { font-size:28px!important; opacity:0.4; }
-
-  .explanation-card {
-    background:rgba(63,72,80,0.15); border:1px solid rgba(63,72,80,0.22);
-    border-radius:8px; padding:14px 16px; margin-top:4px;
-  }
-  .explanation-card .exp-label {
-    font-family:var(--font-body); font-size:10px; font-weight:700;
-    text-transform:uppercase; letter-spacing:0.09em; color:var(--on-surface-var);
-    margin-bottom:8px;
-  }
-  .explanation-card .exp-text {
-    font-family:var(--font-body); font-size:13px; color:var(--on-surface-var);
-    line-height:1.7;
-  }
-  .complexity-analyzing {
-    display:flex; align-items:center; gap:10px;
-    font-family:var(--font-body); font-size:13px; color:#4ec9b0;
-    padding:16px 0 8px;
-  }
-  @keyframes spin { to { transform:rotate(360deg); } }
-  .spin { animation: spin 1s linear infinite; display:inline-block; }
-
-  .analyze-prompt {
-    background: linear-gradient(135deg, rgba(78,201,176,0.08), rgba(78,201,176,0.04));
-    border: 1px solid rgba(78,201,176,0.2); border-radius:9px;
-    padding:14px 16px; margin-top:14px; display:flex; align-items:center; gap:10px;
-  }
-  .analyze-prompt .material-symbols-outlined { color:#4ec9b0; font-size:15px!important; flex-shrink:0; }
-  .analyze-prompt p { margin:0; font-size:12px; color:rgba(78,201,176,0.8); line-height:1.5; font-family:var(--font-body); }
-
-  /* ══════════════════════════════════
-     HISTORY PANEL
-  ══════════════════════════════════ */
-  .history-body { display:flex; flex-direction:column; }
-  .history-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:12px; text-align:center; }
-  .history-empty .mat-icon-large { font-size:38px!important; color:rgba(255,203,48,0.2); }
-  .history-empty p { font-size:13px; color:var(--on-surface-var); line-height:1.6; max-width:220px; margin:0; }
-
-  .history-item {
-    padding:14px 18px; border-bottom:1px solid rgba(63,72,80,0.14);
-    cursor:pointer; transition:background 0.15s;
-    display:flex; flex-direction:column; gap:6px;
-  }
-  .history-item:hover { background:rgba(63,72,80,0.12); }
-  .history-item-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-  .history-item-title { font-family:var(--font-display); font-size:14px; font-weight:700; color:var(--on-surface); }
-  .history-item-time { font-size:10px; color:var(--on-surface-var); font-family:var(--font-body); }
-  .history-item-chips { display:flex; gap:6px; flex-wrap:wrap; }
-  .history-chip {
-    padding:2px 9px; border-radius:100px; font-size:10px; font-weight:700;
-    font-family:var(--font-body); letter-spacing:0.05em; text-transform:uppercase;
-  }
-  .chip-pass { background:rgba(34,255,136,0.1); color:var(--green); border:1px solid rgba(34,255,136,0.25); }
-  .chip-fail { background:rgba(255,77,109,0.1); color:var(--red); border:1px solid rgba(255,77,109,0.25); }
-  .chip-score { background:rgba(63,72,80,0.3); color:var(--on-surface-var); border:1px solid rgba(63,72,80,0.3); }
-
-  .history-badge-row { display:flex; align-items:center; gap:6px; }
-  .history-count-badge {
-    display:inline-flex; align-items:center; justify-content:center;
-    min-width:16px; height:16px; padding:0 5px;
-    background:rgba(255,203,48,0.15); color:#ffcb30;
-    border-radius:100px; font-size:10px; font-weight:800;
-    font-family:var(--font-body); letter-spacing:0.02em;
-    margin-left:4px;
-  }
-
-  @media (max-width: 768px) {
-    .split-container { flex-direction:column; }
-    .divider-v { display:none; }
-    .panel-left { width:100% !important; height:38vh; }
-    .panel-right { flex:1; }
-    .nav-links { display:none; }
-  }
-</style>
 </head>
 <body class="text-on-surface font-body selection:bg-primary/30">
 
@@ -578,62 +228,62 @@
 <div id="app" style="display:none;">
   <div id="drag-overlay"></div>
 
-  <nav class="ws-nav">
-    <div class="nav-left">
-      <a href="index.html" class="nav-logo">UNRAVEL</a>
-      <div class="nav-sep"></div>
-      <button onclick="closeWorkspace()" class="nav-back">
+  <nav class="g-nav">
+    <div class="g-l">
+      <a href="index.html" class="g-logo">UNRAVEL</a>
+      <div class="g-sep"></div>
+      <button onclick="closeWorkspace()" class="g-back">
         <span class="material-symbols-outlined" style="font-size:13px!important">arrow_back_ios_new</span>
         Problem List
       </button>
     </div>
-    <div class="nav-center">
-      <button class="nav-btn ghost" id="run-btn" onclick="runCode()">
+    <div class="g-c">
+      <button class="g-btn ghost" id="run-btn" onclick="runCode()">
         <span class="material-symbols-outlined">play_arrow</span> Run
       </button>
-      <button class="nav-btn primary" id="submit-btn" onclick="submitCode()">
+      <button class="g-btn primary" id="submit-btn" onclick="submitCode()">
         <span class="material-symbols-outlined">cloud_upload</span> Submit
       </button>
-      <button class="nav-btn analyze-btn" id="analyze-btn" onclick="analyzeCode()">
+      <button class="g-btn g-ai" id="analyze-btn" onclick="analyzeCode()">
         <span class="material-symbols-outlined">memory</span> Analyze
       </button>
     </div>
-    <div class="nav-right">
-      <div class="nav-links">
-        <a href="grind.html" class="nav-link active">Grind</a>
-        <a href="know_your_code.html" class="nav-link">Know Your &lt;/&gt;</a>
+    <div class="g-r">
+      <div class="g-links">
+        <a href="grind.html" class="g-link active">Grind</a>
+        <a href="know_your_code.html" class="g-link">Know Your &lt;/&gt;</a>
       </div>
-      <div class="avatar">
+      <div class="g-pic">
         <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNheccznngNZUJdC6lVP9B123_FP2eWAhxYTFvpxkD9YSFLQCuzFZ-lSPdHFYsHhTID-VxFpuq77Xo8g86V_vfsgafc0gNzMipqVbMxkgzeDrkp9ubZ1AmsQg2pRb4tB0K-si2fCQcVln53zO1g4F0OnrurRMIFnQnKqqfqfJIMK_cnqwrS3Q26FwK1wt2PRWTApgwTQQ7QGh3v2Eq4FgLi-0mBFRFT12rmgbWwFpuOl2YkGKcIT32AupR3CH9J7T1qovOZFzCkH9p" alt=""/>
       </div>
     </div>
   </nav>
 
-  <div class="split-container" id="split-container">
+  <div class="g-split" id="split-container">
     <!-- LEFT: Problem Description + Complexity + History -->
-    <div class="panel panel-left" id="panel-left" style="width:420px;flex:0 0 420px;">
-      <div class="panel-tabs">
-        <button class="tab-btn active" data-tab="description">
+    <div class="g-pane g-left" id="panel-left" style="width:420px;flex:0 0 420px;">
+      <div class="g-tabs">
+        <button class="g-tab active" data-tab="description">
           <span class="material-symbols-outlined">description</span> Description
         </button>
-        <button class="tab-btn complexity-tab" data-tab="complexity">
+        <button class="g-tab g-comp-tab" data-tab="complexity">
           <span class="material-symbols-outlined">memory</span> Complexity
         </button>
-        <button class="tab-btn history-tab" data-tab="history">
+        <button class="g-tab g-hist-tab" data-tab="history">
           <span class="material-symbols-outlined">history</span> History
-          <span id="ws-history-count" style="display:none;" class="history-count-badge">0</span>
+          <span id="ws-history-count" style="display:none;" class="g-hist-count">0</span>
         </button>
       </div>
-      <div class="panel-body">
+      <div class="g-body">
 
         <!-- Description tab -->
-        <div data-panel="description" class="tab-panel active">
-          <div class="desc-body" id="ws-desc-body"></div>
+        <div data-panel="description" class="g-panel active">
+          <div class="g-desc" id="ws-desc-body"></div>
         </div>
 
         <!-- Complexity tab -->
-        <div data-panel="complexity" class="tab-panel">
-          <div class="complexity-body">
+        <div data-panel="complexity" class="g-panel">
+          <div class="g-comp">
             <div style="margin-bottom:14px;">
               <div style="font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:0.02em;color:var(--on-surface);margin-bottom:6px;">
                 Complexity Analysis
@@ -643,42 +293,42 @@
               </p>
             </div>
 
-            <div id="complexity-placeholder" class="complexity-empty">
+            <div id="complexity-placeholder" class="g-comp-empty">
               <span class="material-symbols-outlined mat-icon-large">query_stats</span>
               <p>No analysis yet.<br/>Run your code, then press <strong style="color:#4ec9b0">Analyze</strong> to see time &amp; space complexity.</p>
             </div>
 
             <div id="complexity-results" style="display:none;">
-              <div id="complexity-analyzing" class="complexity-analyzing" style="display:none;">
+              <div id="complexity-analyzing" class="g-comp-load" style="display:none;">
                 <span class="material-symbols-outlined spin">refresh</span>
                 Analyzing your code…
               </div>
-              <div class="complexity-card time" id="comp-time-card">
+              <div class="g-comp-card time" id="comp-time-card">
                 <div>
-                  <div class="card-label">Time Complexity</div>
-                  <div id="comp-time-value" class="card-value">—</div>
+                  <div class="g-card-k">Time Complexity</div>
+                  <div id="comp-time-value" class="g-card-v">—</div>
                 </div>
-                <span class="material-symbols-outlined card-icon" style="color:#92ccff">schedule</span>
+                <span class="material-symbols-outlined g-card-i" style="color:#92ccff">schedule</span>
               </div>
-              <div class="complexity-card space" id="comp-space-card">
+              <div class="g-comp-card space" id="comp-space-card">
                 <div>
-                  <div class="card-label">Space Complexity</div>
-                  <div id="comp-space-value" class="card-value">—</div>
+                  <div class="g-card-k">Space Complexity</div>
+                  <div id="comp-space-value" class="g-card-v">—</div>
                 </div>
-                <span class="material-symbols-outlined card-icon" style="color:#c3c7c8">memory</span>
+                <span class="material-symbols-outlined g-card-i" style="color:#c3c7c8">memory</span>
               </div>
-              <div class="explanation-card">
-                <div class="exp-label">Explanation</div>
-                <div id="comp-explanation" class="exp-text">—</div>
+              <div class="g-note">
+                <div class="g-note-k">Explanation</div>
+                <div id="comp-explanation" class="g-note-v">—</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- History tab -->
-        <div data-panel="history" class="tab-panel">
-          <div id="ws-history-list" class="history-body">
-            <div class="history-empty">
+        <div data-panel="history" class="g-panel">
+          <div id="ws-history-list" class="g-hist">
+            <div class="g-hist-empty">
               <span class="material-symbols-outlined mat-icon-large">history_toggle_off</span>
               <p>No submissions yet.<br/>Hit <strong style="color:#ffcb30">Submit</strong> to see your history here.</p>
             </div>
@@ -688,21 +338,21 @@
       </div>
     </div>
 
-    <div class="divider-v" id="divider-v"></div>
+    <div class="g-div-v" id="divider-v"></div>
 
     <!-- RIGHT: Editor + Console -->
-    <div class="panel-right right-split" id="panel-right">
-      <div class="editor-section panel" id="editor-section">
-        <div class="panel-tabs">
-          <button class="tab-btn active" style="color:var(--primary);border-bottom-color:var(--primary);">
+    <div class="g-right g-stack" id="panel-right">
+      <div class="g-edit g-pane" id="editor-section">
+        <div class="g-tabs">
+          <button class="g-tab active" style="color:var(--primary);border-bottom-color:var(--primary);">
             <span class="material-symbols-outlined">code</span> Code
           </button>
           <div style="margin-left:auto;display:flex;align-items:center;gap:4px;padding-right:8px;">
-            <button class="icon-btn" title="Reset" onclick="resetCode()"><span class="material-symbols-outlined">refresh</span></button>
+            <button class="g-icon" title="Reset" onclick="resetCode()"><span class="material-symbols-outlined">refresh</span></button>
           </div>
         </div>
-        <div class="editor-lang-bar">
-          <button class="lang-selector">
+        <div class="g-lang">
+          <button class="g-lang-btn">
             C++ <span class="material-symbols-outlined" style="font-size:14px!important">expand_more</span>
           </button>
         </div>
@@ -711,35 +361,35 @@
         </div>
       </div>
 
-      <div class="divider-h" id="divider-h"></div>
+      <div class="g-div-h" id="divider-h"></div>
 
-      <div class="bottom-section" id="bottom-section" style="height:240px;">
-        <div class="panel-tabs">
-          <button class="tab-btn teal active" data-tab="testcase">
+      <div class="g-bottom" id="bottom-section" style="height:240px;">
+        <div class="g-tabs">
+          <button class="g-tab teal active" data-tab="testcase">
             <span class="material-symbols-outlined" style="color:#4ec9b0">check_box</span> Testcase
           </button>
-          <button class="tab-btn" data-tab="custom-input">
+          <button class="g-tab" data-tab="custom-input">
             <span class="material-symbols-outlined">edit_note</span> Custom Input
           </button>
-          <button class="tab-btn" data-tab="test-result">
+          <button class="g-tab" data-tab="test-result">
             <span class="material-symbols-outlined">terminal</span> Test Result
           </button>
         </div>
 
-        <div data-panel="testcase" class="tab-panel active">
-          <div class="testcase-body">
-            <div class="case-tabs" id="case-tabs-row"></div>
+        <div data-panel="testcase" class="g-panel active">
+          <div class="g-tests">
+            <div class="g-case-tabs" id="case-tabs-row"></div>
             <div id="case-display"></div>
           </div>
         </div>
 
-        <div data-panel="custom-input" class="tab-panel">
-          <textarea id="input-box" class="stdin-area" placeholder="Enter custom input (stdin)…"></textarea>
+        <div data-panel="custom-input" class="g-panel">
+          <textarea id="input-box" class="g-stdin" placeholder="Enter custom input (stdin)…"></textarea>
         </div>
 
-        <div data-panel="test-result" class="tab-panel">
-          <div class="output-area">
-            <div id="test-result-output" class="placeholder">Run your code to see results here.</div>
+        <div data-panel="test-result" class="g-panel">
+          <div class="g-out">
+            <div id="test-result-output" class="g-hint">Run your code to see results here.</div>
           </div>
         </div>
       </div>
@@ -805,10 +455,10 @@
 
   function initTabs(containerEl, defaultTab) {
     const buttons = containerEl.querySelectorAll('[data-tab]');
-    const panels  = containerEl.querySelectorAll('[data-panel]');
+    const panels   = containerEl.querySelectorAll('[data-panel]');
     function activate(tabId) {
       buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
-      panels.forEach(p  => p.classList.toggle('active', p.dataset.panel === tabId));
+      panels.forEach(p => p.classList.toggle('active', p.dataset.panel === tabId));
     }
     buttons.forEach(b => b.addEventListener('click', () => activate(b.dataset.tab)));
     if (defaultTab) activate(defaultTab);
@@ -1687,21 +1337,21 @@ async function openWorkspace(q, tierKey) {
 
   // Build description HTML
   let descHTML = `<h1>${q.id}. ${q.title}</h1>
-  <div class="badge-row">
-    <span class="badge ${q.diffClass}">${q.difficulty}</span>
-    <span class="badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">sell</span> ${q.topic}</span>
+  <div class="g-badges">
+    <span class="g-badge ${q.diffClass}">${q.difficulty}</span>
+    <span class="g-badge tag"><span class="material-symbols-outlined" style="font-size:12px!important;vertical-align:middle">sell</span> ${q.topic}</span>
   </div>
   ${q.description}`;
   q.examples.forEach((ex, i) => {
-    descHTML += `<div class="section-title">Example ${i+1}</div>
-    <div class="code-block">
-      <span class="label">Input:</span> ${esc(ex.input)}<br>
-      <span class="label">Output:</span> ${esc(ex.output)}
-      ${ex.explanation ? `<br><span class="label">Explanation:</span> ${esc(ex.explanation)}` : ''}
+    descHTML += `<div class="g-sec">Example ${i+1}</div>
+    <div class="g-code">
+      <span class="g-label">Input:</span> ${esc(ex.input)}<br>
+      <span class="g-label">Output:</span> ${esc(ex.output)}
+      ${ex.explanation ? `<br><span class="g-label">Explanation:</span> ${esc(ex.explanation)}` : ''}
     </div>`;
   });
   if (q.constraints.length) {
-    descHTML += `<div class="section-title">Constraints</div>
+    descHTML += `<div class="g-sec">Constraints</div>
     <ul style="color:var(--on-surface-var);font-size:13px;line-height:2.1;padding-left:18px;font-family:var(--font-body);">
       ${q.constraints.map(c => `<li><code>${c}</code></li>`).join('')}
     </ul>`;
@@ -1720,7 +1370,7 @@ async function openWorkspace(q, tierKey) {
   const app = document.getElementById('app');
   app.style.display = 'flex';
   app.style.flexDirection = 'column';
-  document.body.classList.add('workspace-active');
+  document.body.classList.add('g-on');
 
   leftTabs   = SplitLayout.initTabs(document.getElementById('panel-left'),    'description');
   bottomTabs = SplitLayout.initTabs(document.getElementById('bottom-section'), 'testcase');
@@ -1738,7 +1388,7 @@ async function openWorkspace(q, tierKey) {
   );
 
   document.getElementById('test-result-output').innerHTML =
-    '<span class="placeholder">Run your code to see results here.</span>';
+    '<span class="g-hint">Run your code to see results here.</span>';
 
   await loadWorkspaceState();
   setTimeout(() => { if (editor) editor.resize(); }, 60);
@@ -1749,10 +1399,10 @@ function buildCaseTabs(q) {
   tabRow.innerHTML = '';
   q.testCases.forEach((tc, i) => {
     const btn = document.createElement('button');
-    btn.className = 'case-tab' + (i === 0 ? ' active' : '');
+    btn.className = 'g-case' + (i === 0 ? ' active' : '');
     btn.textContent = tc.label;
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.case-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.g-case').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentCaseIdx = i;
       renderCaseDisplay(q.testCases[i]);
@@ -1764,14 +1414,14 @@ function buildCaseTabs(q) {
 
 function renderCaseDisplay(tc) {
   document.getElementById('case-display').innerHTML = tc.vars.map(v =>
-    `<div class="var-label">${v.name} =</div><div class="var-value">${v.value}</div>`
+    `<div class="g-var-k">${v.name} =</div><div class="g-var-v">${v.value}</div>`
   ).join('');
 }
 
 function closeWorkspace() {
   document.getElementById('app').style.display = 'none';
   document.getElementById('main-app-container').style.display = 'block';
-  document.body.classList.remove('workspace-active');
+  document.body.classList.remove('g-on');
   showQuestions(currentTierKey);
 }
 
@@ -1793,13 +1443,13 @@ function renderHistoryPanel() {
   const key = `${currentTierKey}_${currentQuestion.id}`;
   const entries = submissionHistory[key] || [];
   const listEl = document.getElementById('ws-history-list');
-  const badge  = document.getElementById('ws-history-count');
+  const badge = document.getElementById('ws-history-count');
 
   badge.textContent = entries.length;
   badge.style.display = entries.length > 0 ? 'inline-flex' : 'none';
 
   if (entries.length === 0) {
-    listEl.innerHTML = `<div class="history-empty">
+    listEl.innerHTML = `<div class="g-hist-empty">
       <span class="material-symbols-outlined mat-icon-large">history_toggle_off</span>
       <p>No submissions yet.<br/>Hit <strong style="color:#ffcb30">Submit</strong> to see your history here.</p>
     </div>`;
@@ -1808,15 +1458,15 @@ function renderHistoryPanel() {
 
   listEl.innerHTML = entries.map((e, i) => {
     const statusChip = e.allPass
-      ? `<span class="history-chip chip-pass">Accepted</span>`
-      : `<span class="history-chip chip-fail">Wrong Answer</span>`;
-    const scoreChip = `<span class="history-chip chip-score">${e.passed}/${e.total} passed</span>`;
-    return `<div class="history-item" onclick="restoreSubmission(${i})">
-      <div class="history-item-top">
-        <div class="history-item-title">${e.allPass ? '✓' : '✗'} Submission #${entries.length - i}</div>
-        <div class="history-item-time">${e.time}</div>
+      ? `<span class="g-chip g-pass">Accepted</span>`
+      : `<span class="g-chip g-fail">Wrong Answer</span>`;
+    const scoreChip = `<span class="g-chip g-score">${e.passed}/${e.total} passed</span>`;
+    return `<div class="g-item" onclick="restoreSubmission(${i})">
+      <div class="g-item-top">
+        <div class="g-item-title">${e.allPass ? '✓' : '✗'} Submission #${entries.length - i}</div>
+        <div class="g-item-time">${e.time}</div>
       </div>
-      <div class="history-item-chips">${statusChip}${scoreChip}</div>
+      <div class="g-item-chips">${statusChip}${scoreChip}</div>
     </div>`;
   }).join('');
 }
@@ -1848,13 +1498,13 @@ function addAnalysisHistory(entry) {
 function renderHistoryPanel() {
   const entries = getCombinedHistoryEntries();
   const listEl = document.getElementById('ws-history-list');
-  const badge  = document.getElementById('ws-history-count');
+  const badge = document.getElementById('ws-history-count');
 
   badge.textContent = entries.length;
   badge.style.display = entries.length > 0 ? 'inline-flex' : 'none';
 
   if (entries.length === 0) {
-    listEl.innerHTML = `<div class="history-empty">
+    listEl.innerHTML = `<div class="g-hist-empty">
       <span class="material-symbols-outlined mat-icon-large">history_toggle_off</span>
       <p>No saved history yet.<br/>Use <strong style="color:#ffcb30">Submit</strong> or <strong style="color:#4ec9b0">Analyze</strong> to save progress.</p>
     </div>`;
@@ -1863,28 +1513,28 @@ function renderHistoryPanel() {
 
   listEl.innerHTML = entries.map((e, i) => {
     if (e.entryType === 'analysis') {
-      return `<div class="history-item" onclick="restoreHistoryEntry(${i})">
-        <div class="history-item-top">
-          <div class="history-item-title">Complexity Analysis</div>
-          <div class="history-item-time">${e.time || new Date(e.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
+      return `<div class="g-item" onclick="restoreHistoryEntry(${i})">
+        <div class="g-item-top">
+          <div class="g-item-title">Complexity Analysis</div>
+          <div class="g-item-time">${e.time || new Date(e.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })}</div>
         </div>
-        <div class="history-item-chips">
-          <span class="history-chip chip-score">${esc(e.timeComplexity || 'N/A')}</span>
-          <span class="history-chip chip-score">${esc(e.spaceComplexity || 'N/A')}</span>
+        <div class="g-item-chips">
+          <span class="g-chip g-score">${esc(e.timeComplexity || 'N/A')}</span>
+          <span class="g-chip g-score">${esc(e.spaceComplexity || 'N/A')}</span>
         </div>
       </div>`;
     }
 
     const statusChip = e.allPass
-      ? `<span class="history-chip chip-pass">Accepted</span>`
-      : `<span class="history-chip chip-fail">Wrong Answer</span>`;
-    const scoreChip = `<span class="history-chip chip-score">${e.passed}/${e.total} passed</span>`;
-    return `<div class="history-item" onclick="restoreHistoryEntry(${i})">
-      <div class="history-item-top">
-        <div class="history-item-title">${e.allPass ? '✓' : '✗'} Submission</div>
-        <div class="history-item-time">${e.time}</div>
+      ? `<span class="g-chip g-pass">Accepted</span>`
+      : `<span class="g-chip g-fail">Wrong Answer</span>`;
+    const scoreChip = `<span class="g-chip g-score">${e.passed}/${e.total} passed</span>`;
+    return `<div class="g-item" onclick="restoreHistoryEntry(${i})">
+      <div class="g-item-top">
+        <div class="g-item-title">${e.allPass ? '✓' : '✗'} Submission</div>
+        <div class="g-item-time">${e.time}</div>
       </div>
-      <div class="history-item-chips">${statusChip}${scoreChip}</div>
+      <div class="g-item-chips">${statusChip}${scoreChip}</div>
     </div>`;
   }).join('');
 }
@@ -2071,22 +1721,22 @@ function renderResults(results, outEl, isSubmit = false) {
 
   if (isSubmit) {
     if (allPass) {
-      html += `<div class="result-summary all-pass">
+      html += `<div class="g-sum g-all-pass">
         <span class="material-symbols-outlined">check_circle</span>
         Accepted — All test cases passed!
-        <span class="score-pill">${passed}/${total}</span>
+        <span class="g-score-pill">${passed}/${total}</span>
       </div>`;
     } else if (hasErr) {
-      html += `<div class="result-summary compile-err">
+      html += `<div class="g-sum g-compile-err">
         <span class="material-symbols-outlined">error</span>
         Compile / Runtime Error
-        <span class="score-pill">${passed}/${total}</span>
+        <span class="g-score-pill">${passed}/${total}</span>
       </div>`;
     } else {
-      html += `<div class="result-summary some-fail">
+      html += `<div class="g-sum g-some-fail">
         <span class="material-symbols-outlined">cancel</span>
         Wrong Answer
-        <span class="score-pill">${passed}/${total} passed</span>
+        <span class="g-score-pill">${passed}/${total} passed</span>
       </div>`;
     }
   } else {
@@ -2100,23 +1750,23 @@ function renderResults(results, outEl, isSubmit = false) {
     const cls   = r.status === 'pass' ? 'pass' : r.status === 'fail' ? 'fail' : 'err';
     const icon  = r.status === 'pass' ? 'check_circle' : r.status === 'fail' ? 'cancel' : 'error';
     const label = r.status === 'pass' ? 'Passed' : r.status === 'fail' ? 'Wrong Answer' : 'Error';
-    const actualClass = r.status === 'fail' ? 'actual-fail' : r.status === 'err' ? 'actual-err' : '';
+    const actualClass = r.status === 'fail' ? 'g-bad' : r.status === 'err' ? 'g-warn' : '';
 
-    html += `<div class="tc-card">
-      <div class="tc-header ${cls}" onclick="this.nextElementSibling.classList.toggle('open')">
-        <span class="material-symbols-outlined tc-status-icon" style="font-size:16px!important">${icon}</span>
-        <span class="tc-label">${r.tc.label}</span>
-        <span class="tc-sublabel">— ${label}</span>
-        <span class="tc-toggle-arrow">▼ details</span>
+    html += `<div class="g-run">
+      <div class="g-run-head ${cls}" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span class="material-symbols-outlined g-run-i" style="font-size:16px!important">${icon}</span>
+        <span class="g-run-k">${r.tc.label}</span>
+        <span class="g-run-sub">— ${label}</span>
+        <span class="g-run-toggle">▼ details</span>
       </div>
-      <div class="tc-body ${i === 0 ? 'open' : ''}">
-        <div class="tc-row-label">Input (stdin)</div>
-        <div class="tc-row-val">${esc(r.tc.stdin)}</div>
-        <div class="tc-row-label">Expected Output</div>
-        <div class="tc-row-val expected">${esc(r.tc.expectedOutput || '(empty)')}</div>
+      <div class="g-run-body ${i === 0 ? 'open' : ''}">
+        <div class="g-row-k">Input (stdin)</div>
+        <div class="g-row-v">${esc(r.tc.stdin)}</div>
+        <div class="g-row-k">Expected Output</div>
+        <div class="g-row-v expected">${esc(r.tc.expectedOutput || '(empty)')}</div>
         ${r.status !== 'pass' ? `
-        <div class="tc-row-label">Your Output</div>
-        <div class="tc-row-val ${actualClass}">${esc(r.actual || '(no output)')}</div>` : ''}
+        <div class="g-row-k">Your Output</div>
+        <div class="g-row-v ${actualClass}">${esc(r.actual || '(no output)')}</div>` : ''}
       </div>
     </div>`;
   });
@@ -2130,3 +1780,5 @@ function esc(s) {
 </script>
 </body>
 </html>
+
+
